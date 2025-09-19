@@ -1,0 +1,164 @@
+import os
+import sys
+import logging
+import json
+import argparse
+import requests
+from pathlib import Path
+import datetime
+sys.path.append(str(Path(__file__).parent.parent.absolute()))
+from utils.printer import print_json_and_save, print_markdown_table_and_save, print_markdown_list_and_save
+from utils.env_loader import load_env_vars
+
+
+def build_parser():
+    parser = argparse.ArgumentParser(description="Execute JQL queries in Jira")
+    parser.add_argument("-m", action="store_true", help="Show menu mode")
+    parser.add_argument("-o", "--output", choices=["json", "mdtable", "mdlist"], default="json", help="Output format (default: json)")
+    parser.add_argument("jql", nargs="?", help="JQL query to execute (if not provided, DEFAULT_JQL from .env will be used)")
+    parser.add_argument("-e", "--env", help="Path to .env file with credentials")
+    parser.add_argument("--max-results", type=int, default=50, help="Maximum number of results to return (default: 50)")
+    return parser
+
+def main():
+    parser = build_parser()
+    args = parser.parse_args()
+
+    if args.m:
+        from menu.menu import main_menu
+        main_menu()
+        return 0
+
+    if not load_env_vars(args.env):
+        logger.error("Could not load environment variables.")
+        return 1
+
+    jql_query = args.jql or os.environ.get("DEFAULT_JQL")
+    if not jql_query:
+        logger.error("No JQL query provided and no DEFAULT_JQL in .env")
+        return 1
+
+    fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description"]
+
+    if args.output == "json":
+        output_format = "json-nested"
+    elif args.output == "mdtable":
+        output_format = "table"
+    elif args.output == "mdlist":
+        output_format = "list"
+    else:
+        output_format = "json-nested"
+
+    results = execute_jql(
+        jql_query=jql_query,
+        max_results=args.max_results,
+        fields=fields,
+        output_format=output_format
+    )
+    return 0 if results else 1
+
+logger = logging.getLogger("JqlQuery")
+
+def extract_required_fields(issue):
+    fields = issue.get('fields', {})
+    return {
+        "id": issue.get('key'),
+        "title": fields.get('summary', ''),
+        "description": fields.get('description', ''),
+        "status": fields.get('status', {}).get('name', ''),
+        "assignee": (fields.get('assignee', {}) or {}).get('displayName', '') if fields.get('assignee') else '',
+        "reporter": (fields.get('reporter', {}) or {}).get('displayName', '') if fields.get('reporter') else '',
+        "created": fields.get('created', ''),
+        "duedate": fields.get('duedate', '')
+    }
+
+def print_table_markdown_and_save(issues, total, jql_query, reports_dir="reports/markdown/table"):
+    """Print the table in markdown and save it to a .md file in /reports/markdown/table with the JQL and timestamp."""
+    # Use the new printer utility for Markdown table
+    filtered = [extract_required_fields(issue) for issue in issues]
+    return print_markdown_table_and_save(filtered, output_dir=reports_dir, jql_query=jql_query)
+
+def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
+    try:
+        # Get credentials
+        jira_server = os.environ.get("JIRA_SERVER", "").strip()
+        jira_token = os.environ.get("JIRA_TOKEN", "").strip()
+        if not jira_server or not jira_token:
+            
+            print("Missing Jira credentials in environment variables")
+            return False
+        if jira_server.endswith('/'):
+            jira_server = jira_server[:-1]
+        api_url = f"{jira_server}/rest/api/2/search"
+        logger.info(f"Executing JQL query: {jql_query}")
+        logger.info(f"Maximum results: {max_results}")
+        if not fields:
+            fields = ["summary", "status", "assignee", "updated", "created", "priority", "issuetype"]
+        params = {
+            "jql": jql_query,
+            "maxResults": max_results,
+            "fields": ",".join(fields)
+        }
+        headers = {
+            "Accept": "application/json",
+            "Authorization": f"Bearer {jira_token}"
+        }
+        response = requests.get(api_url, params=params, headers=headers, timeout=30)
+        if response.status_code == 200:
+            data = response.json()
+            issues = data.get('issues', [])
+            total = data.get('total', 0)
+            logger.info(f"Query successful! Found {len(issues)} issues (of {total} total).")
+            if output_format == "json":
+                filtered = [extract_required_fields(issue) for issue in issues]
+                print_json_and_save(filtered, output_dir="reports/json", jql_query=jql_query)
+            elif output_format == "json-nested":
+                def get_children(parent_key):
+                    child_jql = f'"Parent Link" = {parent_key}'
+                    child_data = execute_jql(child_jql, max_results=100, fields=fields, output_format="none")
+                    children = child_data.get('issues', []) if child_data else []
+                    return [extract_required_fields(child) for child in children]
+                nested = []
+                for issue in issues:
+                    entry = extract_required_fields(issue)
+                    entry["children"] = get_children(issue.get('key'))
+                    nested.append(entry)
+                print_json_and_save(nested, output_dir="reports/json", jql_query=jql_query)
+            elif output_format == "list":
+                def get_children(parent_key):
+                    child_jql = f'"Parent Link" = {parent_key}'
+                    child_data = execute_jql(child_jql, max_results=100, fields=fields, output_format="none")
+                    children = child_data.get('issues', []) if child_data else []
+                    return [extract_required_fields(child) for child in children]
+                nested = []
+                for issue in issues:
+                    entry = extract_required_fields(issue)
+                    entry["children"] = get_children(issue.get('key'))
+                    nested.append(entry)
+                print_markdown_list_and_save(nested, output_dir="reports/markdown/list", jql_query=jql_query)
+            # CSV output removed
+            elif output_format == "table":
+                print_table_markdown_and_save(issues, total, jql_query)
+            else:
+                for issue in issues:
+                    key = issue.get('key')
+                    issue_fields = issue.get('fields', {})
+                    summary = issue_fields.get('summary', 'No summary')
+                    status = issue_fields.get('status', {}).get('name', 'Unknown')
+                    print(f"{key}: {summary} ({status})")
+                if total > len(issues):
+                    print(f"... and {total - len(issues)} more issues.")
+            return data
+        else:
+            logger.error(f"Error in query: {response.status_code}")
+            logger.error(f"Details: {response.text[:500]}")
+            return False
+    except Exception as e:
+        logger.error(f"Error executing JQL query: {str(e)}")
+        return False
+    # ...existing code...
+
+# Main function is defined above
+
+if __name__ == "__main__":
+    sys.exit(main())

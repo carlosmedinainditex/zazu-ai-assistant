@@ -1,0 +1,5 @@
+# Requirements for Jira API tests with Bearer token authentication
+requests>=2.31.0
+python-dotenv==1.0.0
+texttable==1.7.0  # For formatting table output
+colorama==0.4.6  # For terminal colors
