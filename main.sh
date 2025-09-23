@@ -13,12 +13,12 @@ if [ "$1" = "-q" ] && [ -n "$2" ]; then
     
     # Check if we want table output
     if [ "$3" = "-t" ]; then
-        output_format="table"
+        output_format="mdtable"
     else
         output_format="json-nested"
     fi
     
-    python3 handler/jql_query.py "$2" -m 50 -o "$output_format" -f "summary,status,assignee,reporter,priority,fixVersions"
+    python3 handler/jql_query.py "$2" --max-results 50 -o "$output_format"
 else
     # Default to menu mode
     python3 menu/menu.py --shell
