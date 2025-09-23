@@ -6,19 +6,35 @@ import argparse
 import requests
 from pathlib import Path
 import datetime
+import hashlib
 sys.path.append(str(Path(__file__).parent.parent.absolute()))
-from utils.printer import print_json_and_save, print_markdown_table_and_save, print_markdown_list_and_save
+from utils.printer import save_json_to_file
 from utils.env_loader import load_env_vars
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 
 def build_parser():
-    parser = argparse.ArgumentParser(description="Execute JQL queries in Jira")
+    parser = argparse.ArgumentParser(description="Execute JQL queries in Jira - Generates reports in ALL formats by default")
     parser.add_argument("-m", action="store_true", help="Show menu mode")
-    parser.add_argument("-o", "--output", choices=["json", "mdtable", "mdlist"], default="json", help="Output format (default: json)")
     parser.add_argument("jql", nargs="?", help="JQL query to execute (if not provided, DEFAULT_JQL from .env will be used)")
     parser.add_argument("-e", "--env", help="Path to .env file with credentials")
     parser.add_argument("--max-results", type=int, default=50, help="Maximum number of results to return (default: 50)")
     return parser
+
+def extract_required_fields(issue):
+    fields = issue.get('fields', {})
+    return {
+        "id": issue.get('key'),
+        "title": fields.get('summary', ''),
+        "description": fields.get('description', ''),
+        "status": fields.get('status', {}).get('name', ''),
+        "assignee": (fields.get('assignee', {}) or {}).get('displayName', '') if fields.get('assignee') else '',
+        "reporter": (fields.get('reporter', {}) or {}).get('displayName', '') if fields.get('reporter') else '',
+        "created": fields.get('created', ''),
+        "duedate": fields.get('duedate', '')
+    }
 
 def main():
     parser = build_parser()
@@ -38,47 +54,36 @@ def main():
         logger.error("No JQL query provided and no DEFAULT_JQL in .env")
         return 1
 
-    fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description"]
-
-    if args.output == "json":
-        output_format = "json-nested"
-    elif args.output == "mdtable":
-        output_format = "table"
-    elif args.output == "mdlist":
-        output_format = "list"
-    else:
-        output_format = "json-nested"
+    fields = ["summary", "status", "assignee", "reporter", "created", "duedate"]
 
     results = execute_jql(
         jql_query=jql_query,
         max_results=args.max_results,
-        fields=fields,
-        output_format=output_format
+        fields=fields
+    )
+    nested = []
+    for issue in results:
+        entry = extract_required_fields(issue)
+        entry["children"] = get_children_tickets(issue.get('key'))
+        nested.append(entry)
+
+    json_nested_file = save_json_to_file(
+        nested, 
+        jql_query + "_nested", 
+        output_dir="reports/json", 
+        prefix="query_nested", 
+        custom_timestamp=datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     )
     return 0 if results else 1
 
 logger = logging.getLogger("JqlQuery")
 
-def extract_required_fields(issue):
-    fields = issue.get('fields', {})
-    return {
-        "id": issue.get('key'),
-        "title": fields.get('summary', ''),
-        "description": fields.get('description', ''),
-        "status": fields.get('status', {}).get('name', ''),
-        "assignee": (fields.get('assignee', {}) or {}).get('displayName', '') if fields.get('assignee') else '',
-        "reporter": (fields.get('reporter', {}) or {}).get('displayName', '') if fields.get('reporter') else '',
-        "created": fields.get('created', ''),
-        "duedate": fields.get('duedate', '')
-    }
+def get_children_tickets(issue_key):
+    logger.info(f"entro en epicas de {issue_key}")
+    results = execute_jql(f'"Parent Link" = {issue_key}', max_results=100)
+    return results
 
-def print_table_markdown_and_save(issues, total, jql_query, reports_dir="reports/markdown/table"):
-    """Print the table in markdown and save it to a .md file in /reports/markdown/table with the JQL and timestamp."""
-    # Use the new printer utility for Markdown table
-    filtered = [extract_required_fields(issue) for issue in issues]
-    return print_markdown_table_and_save(filtered, output_dir=reports_dir, jql_query=jql_query)
-
-def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
+def execute_jql(jql_query, max_results=50, fields=None):
     try:
         # Get credentials
         jira_server = os.environ.get("JIRA_SERVER", "").strip()
@@ -92,6 +97,7 @@ def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
         api_url = f"{jira_server}/rest/api/2/search"
         logger.info(f"Executing JQL query: {jql_query}")
         logger.info(f"Maximum results: {max_results}")
+        
         if not fields:
             fields = ["summary", "status", "assignee", "updated", "created", "priority", "issuetype"]
         params = {
@@ -109,46 +115,7 @@ def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
             issues = data.get('issues', [])
             total = data.get('total', 0)
             logger.info(f"Query successful! Found {len(issues)} issues (of {total} total).")
-            if output_format == "json":
-                filtered = [extract_required_fields(issue) for issue in issues]
-                print_json_and_save(filtered, output_dir="reports/json", jql_query=jql_query)
-            elif output_format == "json-nested":
-                def get_children(parent_key):
-                    child_jql = f'"Parent Link" = {parent_key}'
-                    child_data = execute_jql(child_jql, max_results=100, fields=fields, output_format="none")
-                    children = child_data.get('issues', []) if child_data else []
-                    return [extract_required_fields(child) for child in children]
-                nested = []
-                for issue in issues:
-                    entry = extract_required_fields(issue)
-                    entry["children"] = get_children(issue.get('key'))
-                    nested.append(entry)
-                print_json_and_save(nested, output_dir="reports/json", jql_query=jql_query)
-            elif output_format == "list":
-                def get_children(parent_key):
-                    child_jql = f'"Parent Link" = {parent_key}'
-                    child_data = execute_jql(child_jql, max_results=100, fields=fields, output_format="none")
-                    children = child_data.get('issues', []) if child_data else []
-                    return [extract_required_fields(child) for child in children]
-                nested = []
-                for issue in issues:
-                    entry = extract_required_fields(issue)
-                    entry["children"] = get_children(issue.get('key'))
-                    nested.append(entry)
-                print_markdown_list_and_save(nested, output_dir="reports/markdown/list", jql_query=jql_query)
-            # CSV output removed
-            elif output_format == "table":
-                print_table_markdown_and_save(issues, total, jql_query)
-            else:
-                for issue in issues:
-                    key = issue.get('key')
-                    issue_fields = issue.get('fields', {})
-                    summary = issue_fields.get('summary', 'No summary')
-                    status = issue_fields.get('status', {}).get('name', 'Unknown')
-                    print(f"{key}: {summary} ({status})")
-                if total > len(issues):
-                    print(f"... and {total - len(issues)} more issues.")
-            return data
+            return issues
         else:
             logger.error(f"Error in query: {response.status_code}")
             logger.error(f"Details: {response.text[:500]}")
@@ -156,8 +123,7 @@ def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
     except Exception as e:
         logger.error(f"Error executing JQL query: {str(e)}")
         return False
-    # ...existing code...
-
+    
 # Main function is defined above
 
 if __name__ == "__main__":

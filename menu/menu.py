@@ -25,7 +25,7 @@ def clear_screen():
     """Clears the terminal screen"""
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def print_header(title="JIRA API TEST TOOL"):
+def print_header(title="JIRA TOOLS"):
     """Prints a header for the menu with colors"""
     clear_screen()
     print(f"{BLUE}============================================={NC}")
@@ -35,22 +35,23 @@ def print_header(title="JIRA API TEST TOOL"):
     
 def run_jql_query():
     """Runs a JQL query"""
-    print(f"{BLUE}Execute JQL Query{NC}")
     jql_query = input("Enter JQL query: ")
     
     max_results = input("Maximum results [50]: ")
     max_results = max_results if max_results else "50"
     
     # Default to table format for the shell version
-    output_format = "table"
+    output_format = input("Output format [mdtable]: ")
+    output_format = "mdtable"
     print(f"{YELLOW}Using table format for output{NC}")
     
     print(f"{BLUE}Running JQL query...{NC}")
     cmd_args = []
     if jql_query:
-        cmd_args.append(shlex.quote(jql_query))
+        # Don't use shlex.quote for JQL queries as it can interfere with syntax
+        cmd_args.append(jql_query)
     
-    cmd_args.extend(["-m", max_results, "-o", output_format, "-f", "summary,status,assignee,reporter,priority,fixVersions"])
+    cmd_args.extend(["--max-results", max_results, "-o", output_format])
     
     run_script(SCRIPT_DIR / "handler" / "jql_query.py", *cmd_args)
     
