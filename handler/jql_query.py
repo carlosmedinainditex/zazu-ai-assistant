@@ -6,8 +6,9 @@ import argparse
 import requests
 from pathlib import Path
 import datetime
+import hashlib
 sys.path.append(str(Path(__file__).parent.parent.absolute()))
-from utils.printer import save_json_to_file, save_markdown_table_to_file, save_markdown_list_to_file
+from utils.printer import save_json_to_file
 from utils.env_loader import load_env_vars
 
 # Configure logging
@@ -17,11 +18,23 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 def build_parser():
     parser = argparse.ArgumentParser(description="Execute JQL queries in Jira - Generates reports in ALL formats by default")
     parser.add_argument("-m", action="store_true", help="Show menu mode")
-    parser.add_argument("-o", "--output", choices=["json", "mdtable", "mdlist"], default="json", help="Output format (DEPRECATED: now generates all formats automatically)")
     parser.add_argument("jql", nargs="?", help="JQL query to execute (if not provided, DEFAULT_JQL from .env will be used)")
     parser.add_argument("-e", "--env", help="Path to .env file with credentials")
     parser.add_argument("--max-results", type=int, default=50, help="Maximum number of results to return (default: 50)")
     return parser
+
+def extract_required_fields(issue):
+    fields = issue.get('fields', {})
+    return {
+        "id": issue.get('key'),
+        "title": fields.get('summary', ''),
+        "description": fields.get('description', ''),
+        "status": fields.get('status', {}).get('name', ''),
+        "assignee": (fields.get('assignee', {}) or {}).get('displayName', '') if fields.get('assignee') else '',
+        "reporter": (fields.get('reporter', {}) or {}).get('displayName', '') if fields.get('reporter') else '',
+        "created": fields.get('created', ''),
+        "duedate": fields.get('duedate', '')
+    }
 
 def main():
     parser = build_parser()
@@ -41,37 +54,36 @@ def main():
         logger.error("No JQL query provided and no DEFAULT_JQL in .env")
         return 1
 
-    fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description"]
-
-    # Since we now generate all formats by default, the output_format parameter is mainly for internal control
-    output_format = "all_formats"  # This signals that we want all formats
+    fields = ["summary", "status", "assignee", "reporter", "created", "duedate"]
 
     results = execute_jql(
         jql_query=jql_query,
         max_results=args.max_results,
-        fields=fields,
-        output_format=output_format
+        fields=fields
+    )
+    nested = []
+    for issue in results:
+        entry = extract_required_fields(issue)
+        entry["children"] = get_children_tickets(issue.get('key'))
+        nested.append(entry)
+
+    json_nested_file = save_json_to_file(
+        nested, 
+        jql_query + "_nested", 
+        output_dir="reports/json", 
+        prefix="query_nested", 
+        custom_timestamp=datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     )
     return 0 if results else 1
 
 logger = logging.getLogger("JqlQuery")
 
-def extract_required_fields(issue):
-    fields = issue.get('fields', {})
-    return {
-        "id": issue.get('key'),
-        "title": fields.get('summary', ''),
-        "description": fields.get('description', ''),
-        "status": fields.get('status', {}).get('name', ''),
-        "assignee": (fields.get('assignee', {}) or {}).get('displayName', '') if fields.get('assignee') else '',
-        "reporter": (fields.get('reporter', {}) or {}).get('displayName', '') if fields.get('reporter') else '',
-        "created": fields.get('created', ''),
-        "duedate": fields.get('duedate', '')
-    }
+def get_children_tickets(issue_key):
+    logger.info(f"entro en epicas de {issue_key}")
+    results = execute_jql(f'"Parent Link" = {issue_key}', max_results=100)
+    return results
 
-
-
-def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
+def execute_jql(jql_query, max_results=50, fields=None):
     try:
         # Get credentials
         jira_server = os.environ.get("JIRA_SERVER", "").strip()
@@ -85,9 +97,6 @@ def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
         api_url = f"{jira_server}/rest/api/2/search"
         logger.info(f"Executing JQL query: {jql_query}")
         logger.info(f"Maximum results: {max_results}")
-        
-        # Prepare timestamp for this execution
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         
         if not fields:
             fields = ["summary", "status", "assignee", "updated", "created", "priority", "issuetype"]
@@ -106,59 +115,7 @@ def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
             issues = data.get('issues', [])
             total = data.get('total', 0)
             logger.info(f"Query successful! Found {len(issues)} issues (of {total} total).")
-        
-            # Generate all output formats
-            filtered = [extract_required_fields(issue) for issue in issues]
-            
-            # 1. JSON format (simple)
-            json_file = save_json_to_file(
-                filtered, 
-                jql_query, 
-                output_dir="reports/json", 
-                prefix="query", 
-                custom_timestamp=timestamp
-            )
-            
-            # 2. JSON format (nested with children)
-            def get_children(parent_key):
-                child_jql = f'"Parent Link" = {parent_key}'
-                child_data = execute_jql(child_jql, max_results=100, fields=fields, output_format="none")
-                children = child_data.get('issues', []) if child_data else []
-                return [extract_required_fields(child) for child in children]
-            
-            nested = []
-            for issue in issues:
-                entry = extract_required_fields(issue)
-                entry["children"] = get_children(issue.get('key'))
-                nested.append(entry)
-                
-            json_nested_file = save_json_to_file(
-                nested, 
-                jql_query + "_nested", 
-                output_dir="reports/json", 
-                prefix="query_nested", 
-                custom_timestamp=timestamp
-            )
-            
-            # 3. Markdown List format
-            list_file = save_markdown_list_to_file(
-                nested, 
-                jql_query, 
-                output_dir="reports/markdown/list", 
-                prefix="query", 
-                custom_timestamp=timestamp
-            )
-            
-            # 4. Markdown Table format
-            table_file = save_markdown_table_to_file(
-                filtered, 
-                jql_query, 
-                output_dir="reports/markdown/table", 
-                prefix="query", 
-                custom_timestamp=timestamp
-            )
-
-            return data
+            return issues
         else:
             logger.error(f"Error in query: {response.status_code}")
             logger.error(f"Details: {response.text[:500]}")
@@ -166,7 +123,7 @@ def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
     except Exception as e:
         logger.error(f"Error executing JQL query: {str(e)}")
         return False
-
+    
 # Main function is defined above
 
 if __name__ == "__main__":
