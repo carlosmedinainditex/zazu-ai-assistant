@@ -35,19 +35,13 @@ def print_header(title="JIRA TOOLS"):
     
 def run_jql_query():
     """Runs a JQL query"""
-    print(f"{BLUE}Execute JQL Query{NC}")
-    print(f"{YELLOW}Examples of JQL syntax:{NC}")
-    print(f"  - issuetype = Initiative")
-    print(f"  - project = MYPROJECT AND status = 'In Progress'")
-    print(f"  - assignee = currentUser() ORDER BY created DESC")
-    print(f"{YELLOW}Note: Use spaces around operators (=, !=, etc.){NC}")
-    print()
     jql_query = input("Enter JQL query: ")
     
     max_results = input("Maximum results [50]: ")
     max_results = max_results if max_results else "50"
     
     # Default to table format for the shell version
+    output_format = input("Output format [mdtable]: ")
     output_format = "mdtable"
     print(f"{YELLOW}Using table format for output{NC}")
     
