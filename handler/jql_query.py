@@ -7,14 +7,17 @@ import requests
 from pathlib import Path
 import datetime
 sys.path.append(str(Path(__file__).parent.parent.absolute()))
-from utils.printer import print_json_and_save, print_markdown_table_and_save, print_markdown_list_and_save
+from utils.printer import save_json_to_file, save_markdown_table_to_file, save_markdown_list_to_file
 from utils.env_loader import load_env_vars
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 
 def build_parser():
-    parser = argparse.ArgumentParser(description="Execute JQL queries in Jira")
+    parser = argparse.ArgumentParser(description="Execute JQL queries in Jira - Generates reports in ALL formats by default")
     parser.add_argument("-m", action="store_true", help="Show menu mode")
-    parser.add_argument("-o", "--output", choices=["json", "mdtable", "mdlist"], default="json", help="Output format (default: json)")
+    parser.add_argument("-o", "--output", choices=["json", "mdtable", "mdlist"], default="json", help="Output format (DEPRECATED: now generates all formats automatically)")
     parser.add_argument("jql", nargs="?", help="JQL query to execute (if not provided, DEFAULT_JQL from .env will be used)")
     parser.add_argument("-e", "--env", help="Path to .env file with credentials")
     parser.add_argument("--max-results", type=int, default=50, help="Maximum number of results to return (default: 50)")
@@ -40,14 +43,8 @@ def main():
 
     fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description"]
 
-    if args.output == "json":
-        output_format = "json-nested"
-    elif args.output == "mdtable":
-        output_format = "table"
-    elif args.output == "mdlist":
-        output_format = "list"
-    else:
-        output_format = "json-nested"
+    # Since we now generate all formats by default, the output_format parameter is mainly for internal control
+    output_format = "all_formats"  # This signals that we want all formats
 
     results = execute_jql(
         jql_query=jql_query,
@@ -72,11 +69,7 @@ def extract_required_fields(issue):
         "duedate": fields.get('duedate', '')
     }
 
-def print_table_markdown_and_save(issues, total, jql_query, reports_dir="reports/markdown/table"):
-    """Print the table in markdown and save it to a .md file in /reports/markdown/table with the JQL and timestamp."""
-    # Use the new printer utility for Markdown table
-    filtered = [extract_required_fields(issue) for issue in issues]
-    return print_markdown_table_and_save(filtered, output_dir=reports_dir, jql_query=jql_query)
+
 
 def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
     try:
@@ -92,6 +85,10 @@ def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
         api_url = f"{jira_server}/rest/api/2/search"
         logger.info(f"Executing JQL query: {jql_query}")
         logger.info(f"Maximum results: {max_results}")
+        
+        # Prepare timestamp for this execution
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        
         if not fields:
             fields = ["summary", "status", "assignee", "updated", "created", "priority", "issuetype"]
         params = {
@@ -109,45 +106,58 @@ def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
             issues = data.get('issues', [])
             total = data.get('total', 0)
             logger.info(f"Query successful! Found {len(issues)} issues (of {total} total).")
-            if output_format == "json":
-                filtered = [extract_required_fields(issue) for issue in issues]
-                print_json_and_save(filtered, output_dir="reports/json", jql_query=jql_query)
-            elif output_format == "json-nested":
-                def get_children(parent_key):
-                    child_jql = f'"Parent Link" = {parent_key}'
-                    child_data = execute_jql(child_jql, max_results=100, fields=fields, output_format="none")
-                    children = child_data.get('issues', []) if child_data else []
-                    return [extract_required_fields(child) for child in children]
-                nested = []
-                for issue in issues:
-                    entry = extract_required_fields(issue)
-                    entry["children"] = get_children(issue.get('key'))
-                    nested.append(entry)
-                print_json_and_save(nested, output_dir="reports/json", jql_query=jql_query)
-            elif output_format == "list":
-                def get_children(parent_key):
-                    child_jql = f'"Parent Link" = {parent_key}'
-                    child_data = execute_jql(child_jql, max_results=100, fields=fields, output_format="none")
-                    children = child_data.get('issues', []) if child_data else []
-                    return [extract_required_fields(child) for child in children]
-                nested = []
-                for issue in issues:
-                    entry = extract_required_fields(issue)
-                    entry["children"] = get_children(issue.get('key'))
-                    nested.append(entry)
-                print_markdown_list_and_save(nested, output_dir="reports/markdown/list", jql_query=jql_query)
-            # CSV output removed
-            elif output_format == "table":
-                print_table_markdown_and_save(issues, total, jql_query)
-            else:
-                for issue in issues:
-                    key = issue.get('key')
-                    issue_fields = issue.get('fields', {})
-                    summary = issue_fields.get('summary', 'No summary')
-                    status = issue_fields.get('status', {}).get('name', 'Unknown')
-                    print(f"{key}: {summary} ({status})")
-                if total > len(issues):
-                    print(f"... and {total - len(issues)} more issues.")
+        
+            # Generate all output formats
+            filtered = [extract_required_fields(issue) for issue in issues]
+            
+            # 1. JSON format (simple)
+            json_file = save_json_to_file(
+                filtered, 
+                jql_query, 
+                output_dir="reports/json", 
+                prefix="query", 
+                custom_timestamp=timestamp
+            )
+            
+            # 2. JSON format (nested with children)
+            def get_children(parent_key):
+                child_jql = f'"Parent Link" = {parent_key}'
+                child_data = execute_jql(child_jql, max_results=100, fields=fields, output_format="none")
+                children = child_data.get('issues', []) if child_data else []
+                return [extract_required_fields(child) for child in children]
+            
+            nested = []
+            for issue in issues:
+                entry = extract_required_fields(issue)
+                entry["children"] = get_children(issue.get('key'))
+                nested.append(entry)
+                
+            json_nested_file = save_json_to_file(
+                nested, 
+                jql_query + "_nested", 
+                output_dir="reports/json", 
+                prefix="query_nested", 
+                custom_timestamp=timestamp
+            )
+            
+            # 3. Markdown List format
+            list_file = save_markdown_list_to_file(
+                nested, 
+                jql_query, 
+                output_dir="reports/markdown/list", 
+                prefix="query", 
+                custom_timestamp=timestamp
+            )
+            
+            # 4. Markdown Table format
+            table_file = save_markdown_table_to_file(
+                filtered, 
+                jql_query, 
+                output_dir="reports/markdown/table", 
+                prefix="query", 
+                custom_timestamp=timestamp
+            )
+
             return data
         else:
             logger.error(f"Error in query: {response.status_code}")
