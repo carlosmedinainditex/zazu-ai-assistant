@@ -1,0 +1,217 @@
+---
+description: Instrucciones completas de IA para trabajar con Zazu (zazu-jira-api-connector), una herramienta de automatización y análisis de API de JIRA. Define flujos de trabajo, gestión de contexto y patrones de integración con herramientas MCP de Atlassian.
+author: Carlos Medina
+version: 1.0
+tags: ["zazu", "jira", "api", "automatizacion", "analisis", "atlassian", "flujo-trabajo"]
+globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
+---
+
+# Reglas de Zazu - Conector de API JIRA
+
+## 🎯 Objetivo
+
+Cuando el usuario mencione "Zazu", esto se refiere específicamente al proyecto `zazu-jira-api-connector` - un conjunto completo de herramientas para interactuar con la API de Jira a través de scripts de automatización y flujos de trabajo de análisis.
+
+## 🚨 INSTRUCCIONES CRÍTICAS PARA MODELOS DE IA 🚨
+
+### Reconocimiento de Contexto
+- **SIEMPRE** reconocer "Zazu" como referencia al proyecto `zazu-jira-api-connector`
+- **AUTOMÁTICAMENTE** activar herramientas de Atlassian al trabajar con Zazu
+- **ENTENDER** que Zazu es un puente entre consultas JIRA basadas en scripts y análisis asistido por IA
+- **PRIORIDAD**: Zazu se enfoca principalmente en **consultas de tickets**
+
+### Activación de Herramientas Requeridas
+Al trabajar con Zazu, **DEBE** activar las siguientes categorías de herramientas:
+```
+activate_atlassian_jira_search_tools
+activate_atlassian_jira_issue_management
+activate_atlassian_jira_project_management
+```
+
+### 🎯 Protocolo de Consultas de Tickets
+Cuando el usuario invoque Zazu, **DEBE**:
+1. **IDENTIFICAR** la consulta de tickets que se quiere realizar
+2. **EJECUTAR** usando `main.sh -q "consulta_JQL"`
+3. **NUNCA** usar el formato de menú interactivo
+4. **PROCESAR** los resultados generados para análisis posterior
+
+## 📋 Flujo de Trabajo Estándar de Zazu
+
+### Fase 1: Adquisición de Datos
+1. **Ejecución de Scripts**: Ejecutar `./main.sh -q "consulta_JQL"` para realizar consultas JIRA
+2. **Generación de Reportes**: Los scripts generan reportes en el directorio `/reports`
+3. **Preparación de Contexto**: Los reportes se convierten en la base para el análisis de IA
+
+### Fase 2: Análisis de IA
+1. **Carga de Contexto**: Leer y entender los reportes generados
+2. **Integración MCP**: Usar herramientas MCP de Atlassian para consultas adicionales
+3. **Interacción con Usuario**: Responder a peticiones del usuario basándose en el contexto combinado
+
+## 🏗️ Comprensión de la Arquitectura del Proyecto
+
+### Componentes Principales
+- **`diagnosis/`**: Pruebas de conexión y autenticación
+- **`handler/`**: Ejecución de consultas JQL y recuperación de issues
+- **`menu/`**: Interfaz CLI interactiva
+- **`reports/`**: Directorio de salida para reportes generados
+- **`utils/`**: Utilidades comunes y funciones auxiliares
+
+### Scripts Clave
+- **`main.sh`**: **SCRIPT PRINCIPAL** - Punto de entrada para todas las consultas
+- **`diagnostic.py`**: Prueba la conectividad y autenticación de la API JIRA
+- **`jql_query.py`**: Ejecuta consultas JQL con múltiples formatos de salida
+- **`issue_query.py`**: Recupera información detallada de issues
+- **`menu.py`**: Interfaz interactiva (NO USAR con Zazu)
+
+## ⚡ Ejecución de Consultas de Tickets con Zazu
+
+### 🚨 MÉTODO DE EJECUCIÓN OBLIGATORIO
+```bash
+./main.sh -q "consulta_JQL_escapada"
+```
+
+### Formato de Consultas JQL
+- **Escapado correcto**: Comillas dobles para la consulta completa
+- **Ejemplos válidos**:
+  ```bash
+  ./main.sh -q "project = PROJ AND status = 'In Progress'"
+  ./main.sh -q "assignee = currentUser() AND priority = High"
+  ./main.sh -q "created >= -7d AND labels = critical"
+  ```
+
+### ❌ PROHIBIDO
+- **NO** usar `menu.py` o modo interactivo
+- **NO** ejecutar scripts individuales directamente
+- **SIEMPRE** usar `main.sh -q` como punto de entrada único
+
+## 🔧 Trabajando con Reportes de Zazu
+
+### Ubicación de Reportes
+- **Ruta Principal**: `/Users/carlos.medina/workspace/zazu-jira-api-connector/reports/`
+- **Formatos Soportados**: JSON, Markdown (lista/tabla), texto plano
+
+### Protocolo de Análisis de Reportes
+1. **SIEMPRE** verificar reportes existentes antes de hacer nuevas llamadas MCP
+2. **LEER** contenido de reportes para entender el contexto de datos actual
+3. **COMPLEMENTAR** con consultas MCP solo cuando se necesiten datos adicionales
+4. **CORRELACIONAR** resultados de scripts con datos MCP en vivo para precisión
+
+## ⚠️ Reglas de Comportamiento Críticas
+
+### Cuando el Usuario Menciona Zazu
+```python
+# Modelo Mental de IA
+if user_mentions("zazu"):
+    context = "proyecto zazu-jira-api-connector"
+    focus = "consultas de tickets"
+    activate_tools(["atlassian_jira_*"])
+    ask_for_jql_query()  # Primera acción: identificar consulta
+    execution_method = "./main.sh -q 'consulta_escapada'"
+    no_menu_mode = True  # NUNCA usar menú interactivo
+    check_reports_directory()
+    prepare_for_jira_analysis()
+```
+
+### Comprensión del Flujo de Datos
+1. **Script → Reporte**: Los scripts de Zazu generan datos estructurados
+2. **Reporte → Contexto**: La IA lee y entiende el contenido del reporte
+3. **Contexto + MCP → Análisis**: Los datos combinados permiten respuestas completas
+4. **Análisis → Usuario**: Entregar insights basados en información completa
+
+### Patrones de Respuesta
+- **REFERENCIAR** datos del reporte cuando estén disponibles
+- **COMPLEMENTAR** con consultas MCP para información en tiempo real
+- **EXPLICAR** discrepancias entre reporte y datos en vivo
+- **SUGERIR** re-ejecución de scripts cuando los datos parezcan obsoletos
+
+## 🛠️ Integración con MCP de Atlassian
+
+### Uso Complementario
+- **Los Reportes proporcionan**: Instantáneas históricas, resultados de consultas masivas
+- **MCP proporciona**: Datos en tiempo real, información detallada de issues, detalles de usuarios
+
+### Estrategia de Consultas
+1. **Comenzar con reportes**: Entender el contexto de datos existente
+2. **Identificar brechas**: Determinar qué información adicional se necesita
+3. **Llamadas MCP estratégicas**: Hacer consultas dirigidas para llenar brechas de información
+4. **Sintetizar resultados**: Combinar datos de reportes y MCP para imagen completa
+
+## 📝 Patrones de Comunicación
+
+### Procesamiento de Peticiones del Usuario
+```
+Usuario: "Zazu, muéstrame los issues críticos de la semana pasada"
+Flujo de Respuesta de IA:
+1. Verificar /reports para resultados de consultas JQL recientes
+2. Si no hay reportes relevantes: 
+   - Construir consulta JQL apropiada
+   - Ejecutar: ./main.sh -q "priority = Critical AND created >= -7d"
+3. Si existen reportes: analizar contenido
+4. Usar MCP para obtener actualizaciones de estado en tiempo real si es necesario
+5. Presentar análisis completo
+```
+
+### Construcción de Consultas JQL
+Al recibir una petición, **DEBE**:
+1. **TRADUCIR** la petición del usuario a sintaxis JQL válida
+2. **ESCAPAR** correctamente la consulta para línea de comandos
+3. **EJECUTAR** usando `./main.sh -q "consulta"`
+4. **PROCESAR** los resultados del reporte generado
+
+### Reporte de Estado
+- **Antigüedad del Reporte**: Siempre mencionar cuándo fueron generados los reportes
+- **Frescura de Datos**: Indicar si los datos MCP difieren de los reportes
+- **Sugerencias de Acción**: Recomendar re-ejecución de scripts cuando sea apropiado
+
+## 🔍 Casos de Uso Comunes de Zazu
+
+### 1. Análisis de Issues
+- **Script**: Extraer issues vía JQL
+- **Reporte**: Datos estructurados de issues
+- **IA**: Analizar patrones, prioridades, tendencias
+- **MCP**: Obtener estado actual, actualizaciones recientes
+
+### 2. Verificaciones de Salud del Proyecto
+- **Script**: Consultar métricas del proyecto
+- **Reporte**: Resúmenes estadísticos
+- **IA**: Identificar riesgos, cuellos de botella
+- **MCP**: Verificar estado actual del proyecto
+
+### 3. Análisis de Sprints
+- **Script**: Extraer datos de sprint
+- **Reporte**: Métricas de sprint y listas de issues
+- **IA**: Análisis de rendimiento
+- **MCP**: Estado actual del sprint y bloqueadores
+
+## 🚀 Mejores Prácticas
+
+### Eficiencia
+- **LEER reportes primero** antes de hacer llamadas MCP
+- **AGRUPAR consultas MCP** cuando se necesiten múltiples llamadas
+- **CACHEAR insights** del análisis de reportes
+
+### Precisión
+- **VERIFICAR** información crítica con MCP cuando sea necesario
+- **VERIFICAR FECHAS** de datos de reportes para relevancia
+- **CROSS-REFERENCIAR** diferentes fuentes de datos
+
+### Experiencia de Usuario
+- **PROACTIVO**: Sugerir scripts de Zazu relevantes
+- **TRANSPARENTE**: Explicar fuentes de datos y frescura
+- **ACCIONABLE**: Proporcionar próximos pasos y recomendaciones
+
+## 🔄 Mejora Continua
+
+### Aprendizaje de Interacciones
+- **IDENTIFICAR** patrones de consulta comunes
+- **SUGERIR** optimizaciones de scripts
+- **RECOMENDAR** mejoras en formato de reportes
+
+### Optimización de Flujo de Trabajo
+- **AGILIZAR** flujo de datos de scripts a análisis
+- **AUTOMATIZAR** patrones de análisis rutinarios
+- **MEJORAR** integración entre herramientas Zazu y MCP
+
+---
+
+**Recuerda**: Zazu no es solo una herramienta - es un sistema completo de flujo de trabajo para análisis de datos JIRA. Siempre piensa en términos del pipeline completo: Script → Reporte → Análisis → Insights → Acción.
