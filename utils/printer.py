@@ -69,9 +69,7 @@ def save_markdown_table_to_file(elements, jql_query, output_dir="reports/markdow
         table_lines.append("|" + "|".join(row) + "|")
     md_content = f"# JQL Results\n\n**JQL triggered:** `{jql_query}`\n\n"
     md_content += "\n".join(table_lines)
-    output_path = save_to_file(md_content, output_dir, "md", prefix, custom_timestamp)
-    print(f"Generated file: {output_path}")
-    return output_path
+    return save_to_file(md_content, output_dir, "md", prefix, custom_timestamp)
 
 def save_markdown_list_to_file(elements, jql_query, output_dir="reports/markdown/list", prefix="output", custom_timestamp=None):
     """
