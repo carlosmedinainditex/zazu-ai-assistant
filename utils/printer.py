@@ -7,6 +7,7 @@ from pathlib import Path
 def save_to_file(content, output_dir, ext, prefix="output", custom_timestamp=None):
     """
     Save content to a file in output_dir with a timestamp and prefix. Returns the output path.
+    Prints confirmation message.
     
     Args:
         content: Content to save
@@ -21,6 +22,7 @@ def save_to_file(content, output_dir, ext, prefix="output", custom_timestamp=Non
     output_path = os.path.join(output_dir, output_filename)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(content)
+    print(f"Generated file: {output_path}")
     return output_path
 
 def save_json_to_file(elements, jql_query, output_dir="reports/json", prefix="output", custom_timestamp=None):
@@ -36,9 +38,7 @@ def save_json_to_file(elements, jql_query, output_dir="reports/json", prefix="ou
     """
     json_content = json.dumps(elements, indent=2, ensure_ascii=False)
     json_content = f"// JQL: {jql_query}\n" + json_content
-    output_path = save_to_file(json_content, output_dir, "json", prefix, custom_timestamp)
-    print(f"Generate file: {output_path}")
-    return output_path
+    return save_to_file(json_content, output_dir, "json", prefix, custom_timestamp)
 
 def save_markdown_table_to_file(elements, jql_query, output_dir="reports/markdown/table", prefix="output", custom_timestamp=None):
     """

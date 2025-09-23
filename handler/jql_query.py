@@ -166,7 +166,6 @@ def execute_jql(jql_query, max_results=50, fields=None, output_format="simple"):
     except Exception as e:
         logger.error(f"Error executing JQL query: {str(e)}")
         return False
-    # ...existing code...
 
 # Main function is defined above
 
