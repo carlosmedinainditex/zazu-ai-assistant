@@ -79,7 +79,6 @@ def main():
 logger = logging.getLogger("JqlQuery")
 
 def get_children_tickets(issue_key):
-    logger.info(f"entro en epicas de {issue_key}")
     results = execute_jql(f'"Parent Link" = {issue_key}', max_results=100)
     formatted_results = []
     for issue in results:
