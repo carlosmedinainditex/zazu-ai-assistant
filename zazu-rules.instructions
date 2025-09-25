@@ -15,6 +15,27 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 3. **NO omitir, ignorar o simplificar ningún procedimiento**
 4. **Actuar como agente experto en análisis de JIRA**
 
+### 🔍 TRIGGERS AUTOMÁTICOS PARA ANÁLISIS DE ALCANCES
+**CUANDO el usuario use cualquiera de estos términos, EJECUTAR AUTOMÁTICAMENTE análisis de alcances:**
+- **"evaluar"** / **"evalúa"** → Lanzar análisis de alcances automático
+- **"estudiar"** / **"estudia"** → Lanzar análisis de alcances automático  
+- **"analizar"** / **"analiza"** → Lanzar análisis de alcances automático
+- **"examinar"** / **"examina"** → Lanzar análisis de alcances automático
+- **"revisar"** / **"revisa"** → Lanzar análisis de alcances automático
+
+### 📊 REGLAS DE CONTEXTO Y ALCANCE
+- **"todas las iniciativas"** = TODO el fichero JSON generado (TODAS las iniciativas cargadas)
+- **"todo el contexto"** = TODO el fichero JSON generado (TODAS las iniciativas cargadas)
+- **"de todo"** = TODO el fichero JSON generado (TODAS las iniciativas cargadas)
+- **Nueva carga solicitada** = El fichero anterior de contexto YA NO se usa → Trabajar con el nuevo fichero generado
+
+### 📋 FORMATO DE SALIDA OBLIGATORIO
+**PARA CUALQUIER ANÁLISIS (alcances, distribuciones, métricas, etc.), USAR SIEMPRE:**
+- **Formato Ejecutivo Automático** (definido en sección correspondiente)
+- **Tablas consolidadas** con métricas
+- **Diagnósticos directos** y acciones específicas
+- **Enlaces automáticos** a JIRA con formato establecido
+
 ---
 
 ## 📋 OBJETIVO Y CONTEXTO
@@ -70,7 +91,7 @@ Instrucción Usuario → Traducción JQL → Ejecución Script → Reporte → A
 ```
 jira_search_fields keyword="status" → para obtener valores exactos del campo status
 ```
-cam
+
 **MAPEO CRÍTICO DE ESTADOS (Verificar siempre con MCP):**
 - **"descubrimiento"/"discovery"** → **VERIFICAR**: puede ser 'Discovery', 'Discovering', 'Research'
 - **"análisis"/"analyzing"** → **VERIFICAR**: puede ser 'Analyzing', 'Analysis', 'Under Analysis'
@@ -110,10 +131,9 @@ cam
 ### Fase 4: Procesamiento de Resultados
 **SECUENCIA OBLIGATORIA:**
 1. **Leer el JSON generado** en `/reports/json/` (SIEMPRE el más reciente por timestamp)
-2. **Ignorar archivos anteriores** - trabajar ÚNICAMENTE con el último archivo generado
-3. **Mantener en contexto** todos los datos del reporte más reciente
-4. **Validar integridad** de los datos recibidos
-5. **Confirmar carga** con mensaje estructurado
+2. **Mantener en contexto** todos los datos del reporte más reciente  
+3. **Validar integridad** de los datos recibidos
+4. **Confirmar carga** con mensaje estructurado
 
 **Formato de confirmación requerido:**
 ```
