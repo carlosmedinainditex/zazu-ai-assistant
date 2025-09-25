@@ -32,10 +32,15 @@ Instrucción Usuario → Traducción JQL → Ejecución Script → Reporte → A
 ## 🔄 FLUJO DE TRABAJO OBLIGATORIO
 
 ### Fase 1: Verificación de Contexto
+**REGLAS DE PRIORIDAD DE DATOS:**
+- 🚨 **REGLA CRÍTICA**: Una vez ejecutada una "carga", SIEMPRE usar el último archivo JSON generado por el script
+- ❌ **PROHIBIDO**: Contemplar o buscar otros archivos JSON anteriores
+- ✅ **OBLIGATORIO**: Trabajar exclusivamente con el archivo más reciente creado por `./main.sh`
+
 **ANTES de cualquier acción, VERIFICAR:**
 - [ ] ¿Existe un reporte JSON reciente en `/reports/json/`?
-- [ ] ¿La consulta solicitada coincide con datos ya cargados?
-- [ ] ¿Los datos son suficientemente frescos (< 24h) para el análisis?
+- [ ] Si hay múltiples archivos, usar ÚNICAMENTE el más reciente (último timestamp)
+- [ ] ¿Los datos son suficientemente frescos para el análisis solicitado?
 
 ### Fase 2: Traducción de Instrucciones
 **MAPEO OBLIGATORIO de conceptos a JQL:**
@@ -65,7 +70,7 @@ Instrucción Usuario → Traducción JQL → Ejecución Script → Reporte → A
 ```
 jira_search_fields keyword="status" → para obtener valores exactos del campo status
 ```
-
+cam
 **MAPEO CRÍTICO DE ESTADOS (Verificar siempre con MCP):**
 - **"descubrimiento"/"discovery"** → **VERIFICAR**: puede ser 'Discovery', 'Discovering', 'Research'
 - **"análisis"/"analyzing"** → **VERIFICAR**: puede ser 'Analyzing', 'Analysis', 'Under Analysis'
@@ -88,7 +93,7 @@ jira_search_fields keyword="status" → para obtener valores exactos del campo s
 **⚠️ IMPORTANTE**: El campo de estado en JIRA es SIEMPRE `status`, independientemente del nombre que aparezca en la interfaz web (puede mostrarse como "Estado", "Status", "Estado de la Iniciativa", etc., pero en JQL es siempre `status`)
 
 #### Valores Comunes Adicionales
-- **Verticales**: 'Proveedor', 'Cliente', 'Infraestructura', 'Plataforma'
+- **Verticales**: 'Proveedor', 'Producto Terminado', 'Desarrollo de Producto', 'Dirección y Planificación','Ingeniería', 'Materias Primas', 'Plataforma'
 - **Prioridades**: 'High', 'Medium', 'Low', 'Critical'
 
 ### Fase 3: Ejecución de Consulta
@@ -104,10 +109,11 @@ jira_search_fields keyword="status" → para obtener valores exactos del campo s
 
 ### Fase 4: Procesamiento de Resultados
 **SECUENCIA OBLIGATORIA:**
-1. **Leer el JSON generado** en `/reports/json/`
-2. **Mantener en contexto** todos los datos del reporte
-3. **Validar integridad** de los datos recibidos
-4. **Confirmar carga** con mensaje estructurado
+1. **Leer el JSON generado** en `/reports/json/` (SIEMPRE el más reciente por timestamp)
+2. **Ignorar archivos anteriores** - trabajar ÚNICAMENTE con el último archivo generado
+3. **Mantener en contexto** todos los datos del reporte más reciente
+4. **Validar integridad** de los datos recibidos
+5. **Confirmar carga** con mensaje estructurado
 
 **Formato de confirmación requerido:**
 ```
@@ -181,27 +187,27 @@ jira_search_fields keyword="status" → para obtener valores exactos del campo s
    ```
    🎯 ESCALA DE EVALUACIÓN AUTOMÁTICA ESTRICTA:
    
-   5️⃣ PERFECTAMENTE ALINEADO (98-100%)
+   5️⃣ PERFECTAMENTE ALINEADO (90-100%)
    - Épicas cubren exactamente el scope de la iniciativa
    - Cobertura completa sin gaps ni sobrecobertura
    - Alineación precisa entre descripción y descomposición
    
-   4️⃣ BIEN ALINEADO (90-97%)
+   4️⃣ BIEN ALINEADO (70-90%)
    - Épicas cubren casi todo el scope definido
    - Gaps mínimos (<10%) o sobrecobertura leve
    - Alineación clara con desviaciones menores
    
-   3️⃣ MODERADAMENTE ALINEADO (75-89%)
+   3️⃣ MODERADAMENTE ALINEADO (60-70%)
    - Cobertura parcial del scope definido
    - Gaps moderados (10-25%) o sobrecobertura notable
    - Algunas épicas desalineadas del objetivo principal
    
-   2️⃣ MAL ALINEADO (50-74%)
+   2️⃣ MAL ALINEADO (40-60%)
    - Cobertura insuficiente o excesiva del scope
    - Gaps importantes (25-50%) o sobrecobertura significativa
    - Desconexión evidente entre niveles
    
-   1️⃣ COMPLETAMENTE DESALINEADO (<50%)
+   1️⃣ COMPLETAMENTE DESALINEADO (<40%)
    - Épicas no reflejan la iniciativa o la sobrepasan masivamente
    - Desconexión total entre descripción y descomposición
    - Fragmentación completa del alcance
@@ -239,7 +245,7 @@ jira_search_fields keyword="status" → para obtener valores exactos del campo s
 
 ### 🎯 EVALUACIONES INDIVIDUALES
 
-#### 📋 [INICIATIVA-ID]: [[Título](https://jira.inditex.com/jira/browse/INICIATIVA-ID)] → **X/5**
+#### 📋 [INICIATIVA-ID]: [[${iniciativa.title}](https://jira.inditex.com/jira/browse/INICIATIVA-ID)] → **X/5**
 - **Diagnóstico directo**: [MENSAJE_DIRECTO_ESPECÍFICO]  
 - **Tipo de problema**: [INFRACOBERTURA/SOBRECOBERTURA/DESALINEACIÓN/ALINEADO]
 - **Acción requerida**: [1 acción concreta y específica]
@@ -293,7 +299,9 @@ jira_search_fields keyword="status" → para obtener valores exactos del campo s
 - ✅ **Proponer UNA acción crítica** por iniciativa
 - ✅ **Presentar formato ejecutivo** consolidado
 - ✅ **FORMATO OBLIGATORIO de enlaces**: Todos los títulos de iniciativas DEBEN incluir enlace JIRA usando formato `[[Título](https://jira.inditex.com/jira/browse/INICIATIVA-ID)]`
+- ✅ **CAMPO TÍTULO OBLIGATORIO**: El [Título] DEBE extraerse del campo `"title"` del JSON generado
 - ✅ **Extraer ID automáticamente**: Usar el campo `key` o `id` de cada iniciativa para construir la URL
+- ✅ **Formato de enlaces automático**: `[[${iniciativa.title}](https://jira.inditex.com/jira/browse/${iniciativa.key})]`
 
 ---
 
