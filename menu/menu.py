@@ -77,7 +77,7 @@ def query_issue():
 def shell_menu():
     """Main menu for the Jira tools application"""
     while True:
-        print_header("JIRA TOOLS")
+        print_header("ZAZU - JIRA TOOLS")
         print(f"{GREEN}1. Run complete Jira connection diagnosis{NC}")
         print(f"{GREEN}2. Execute JQL query{NC}")
         print(f"{GREEN}3. Get issue details{NC}")
