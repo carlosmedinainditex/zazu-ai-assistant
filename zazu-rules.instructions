@@ -54,9 +54,16 @@ Instrucción Usuario → Traducción JQL → Ejecución Script → Reporte → A
 - **Prioridad** → `priority = '[valor]'`
 
 #### Estados de JIRA - Mapeo Oficial (USAR MCP ATLASSIAN OBLIGATORIO)
+
+**🚨 CAMPO DE ESTADO OFICIAL: `status` (NUNCA otros nombres)**
+- ✅ **CORRECTO**: `status = 'Discovery'`
+- ❌ **INCORRECTO**: `"Estado de Iniciativa" = 'Discovery'`
+- ❌ **INCORRECTO**: `"Estado" = 'Discovery'`  
+- ❌ **INCORRECTO**: `"Issue Status" = 'Discovery'`
+
 **ANTES de usar cualquier estado en JQL, VERIFICAR con MCP Atlassian:**
 ```
-jira_search_fields keyword="status" → para obtener valores exactos
+jira_search_fields keyword="status" → para obtener valores exactos del campo status
 ```
 
 **MAPEO CRÍTICO DE ESTADOS (Verificar siempre con MCP):**
@@ -75,8 +82,10 @@ jira_search_fields keyword="status" → para obtener valores exactos
 1. Usuario menciona estado (ej: "discovery", "análisis")
 2. **EJECUTAR MCP**: `jira_search_fields keyword="[término]"`
 3. **IDENTIFICAR** valor exacto de la respuesta MCP
-4. **USAR** valor exacto en JQL: `status = '[valor_exacto_MCP]'`
+4. **USAR SIEMPRE campo `status`** en JQL: `status = '[valor_exacto_MCP]'`
 5. **CONFIRMAR** con usuario el mapeo aplicado
+
+**⚠️ IMPORTANTE**: El campo de estado en JIRA es SIEMPRE `status`, independientemente del nombre que aparezca en la interfaz web (puede mostrarse como "Estado", "Status", "Estado de la Iniciativa", etc., pero en JQL es siempre `status`)
 
 #### Valores Comunes Adicionales
 - **Verticales**: 'Proveedor', 'Cliente', 'Infraestructura', 'Plataforma'
