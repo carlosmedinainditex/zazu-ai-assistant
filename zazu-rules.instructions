@@ -130,57 +130,88 @@ Instrucción Usuario → Traducción JQL → Ejecución Script → Reporte → A
 
 ## 🎯 ANÁLISIS ESPECIALIZADO: EVALUACIÓN DE ALCANCES
 
-### Activación
-**Trigger:** Usuario solicita "evalúa alcances", "analiza alcances", o "compara alcances"
+### Activación Automática
+**Trigger:** Usuario solicita "analiza alcances" - **EJECUTAR AUTOMÁTICAMENTE**
 
-### Flujo Obligatorio
-1. **Aclaración de scope:**
+### Flujo Automático Obligatorio
+1. **Detectar iniciativas en contexto:**
+   - Si hay iniciativas cargadas → Procesar automáticamente TODAS
+   - Si no hay contexto → Solicitar carga previa de iniciativas
+
+2. **Procesamiento automático por iniciativa:**
+   - Acceder al campo `['children']` de cada iniciativa
+   - Extraer `description` de la iniciativa padre
+   - Para cada épica en children: extraer su `description`
+   - Ejecutar análisis semántico automático
+
+3. **Evaluación automática (Escala 1-5):**
    ```
-   🎯 ¿Qué alcance quieres analizar?
-   1. Todas las iniciativas del contexto cargado
-   2. Una iniciativa específica (indica el ID)
-   3. Comparación entre iniciativas seleccionadas
+   🎯 ESCALA DE EVALUACIÓN AUTOMÁTICA:
+   
+   5️⃣ PERFECTAMENTE ALINEADO
+   - Épicas cubren 95-100% del scope de la iniciativa
+   - Sin gaps significativos ni overlaps
+   
+   4️⃣ BIEN ALINEADO  
+   - Épicas cubren 80-94% del scope
+   - Gaps menores o overlaps mínimos
+   
+   3️⃣ MODERADAMENTE ALINEADO
+   - Épicas cubren 60-79% del scope
+   - Algunos gaps o overlaps evidentes
+   
+   2️⃣ MAL ALINEADO
+   - Épicas cubren 40-59% del scope
+   - Gaps significativos o overlaps importantes
+   
+   1️⃣ COMPLETAMENTE DESALINEADO
+   - Épicas cubren <40% del scope
+   - Desconexión evidente entre niveles
    ```
 
-2. **Recuperación de datos:**
-   - Usar MCP para obtener descripciones completas
-   - Recuperar épicas hijas de cada iniciativa
-   - Obtener historias relacionadas si es relevante
+4. **Detección automática de patrones:**
+   - **SOBRE-EVALUACIÓN**: Iniciativa describe MÁS de lo que suman las épicas
+   - **INFRA-EVALUACIÓN**: Épicas suman MÁS de lo que describe la iniciativa
+   - **FRAGMENTACIÓN**: Épicas van en direcciones diferentes a la iniciativa
+   - **COHERENCIA**: Alineamiento natural entre descripción y descomposición
 
-3. **Análisis comparativo:**
-   - Contrastar descripción de iniciativa vs agregado de épicas
-   - Evaluar completitud, coherencia y alineamiento
-   - Identificar gaps, solapamientos y inconsistencias
-
-4. **Evaluación y recomendaciones:**
-   - **Sobreestimada**: Iniciativa más amplia que suma de épicas
-   - **Infraestimada**: Épicas cubren más scope que iniciativa describe
-   - **Alineada**: Coherencia razonable entre niveles
-   - **Fragmentada**: Épicas no coherentes con iniciativa
-
-### Formato de Entrega
+### Formato Ejecutivo Automático
 ```markdown
-## 📋 Análisis de Alcances - [Iniciativa ID]
+## � ANÁLISIS AUTOMÁTICO DE ALCANCES
 
-### 🎯 Resumen Ejecutivo
-- **Estado**: [Alineada/Sobreestimada/Infraestimada/Fragmentada]
-- **Confianza**: [Alta/Media/Baja]
-- **Acción recomendada**: [Específica]
+### 📊 RESUMEN EJECUTIVO CONSOLIDADO
+| Iniciativa | ID | Puntuación | Estado | Acción Crítica |
+|------------|----|-----------:|--------|----------------|
+| [Título]   | ID | X/5        | STATUS | ACCIÓN         |
 
-### 📊 Detalles del Análisis
-**Iniciativa**: [Resumen de descripción]
-**Épicas (X)**: [Resumen agregado]
+### 🎯 EVALUACIONES INDIVIDUALES
 
-### ⚠️ Discrepancias Identificadas
-1. [Discrepancia específica]
-2. [Otra discrepancia]
+#### 📋 [INICIATIVA-ID]: [Título] → **X/5**
+- **Diagnóstico**: [SOBRE/INFRA/FRAGMENTADA/ALINEADA]  
+- **Gap crítico**: [Descripción específica del problema]
+- **Acción inmediata**: [1 acción concreta y específica]
+- **Épicas analizadas**: X épicas procesadas
 
-### 🎯 Recomendaciones
-1. [Acción concreta]
-2. [Otra acción]
-
-**Fuente**: Reporte local [timestamp] + MCP [timestamp]
+---
+**⏱️ Análisis ejecutado**: [timestamp]
+**🔍 Método**: Comparación semántica automática description vs children
 ```
+
+### Algoritmo de Análisis Automático
+**PROCESO INTERNO (No mostrar al usuario):**
+1. **Extracción**: `iniciativa['description']` vs `sum(epica['description'] for epica in iniciativa['children'])`
+2. **Análisis semántico**: Comparar alcance, objetivos, entregables mencionados
+3. **Cálculo de score**: Basado en cobertura, coherencia y completitud
+4. **Clasificación automática**: Asignar categoría (SOBRE/INFRA/FRAGMENTADA/ALINEADA)
+5. **Generación de acción**: Derivar 1 acción específica por iniciativa
+
+### Reglas de Automatización
+- ✅ **NO preguntar** qué iniciativas analizar - procesar TODAS automáticamente
+- ✅ **Acceder directamente** al campo `['children']` de cada iniciativa
+- ✅ **Generar puntuación 1-5** para cada iniciativa
+- ✅ **Identificar automáticamente** el tipo de desalineación
+- ✅ **Proponer UNA acción crítica** por iniciativa
+- ✅ **Presentar formato ejecutivo** consolidado
 
 ---
 
