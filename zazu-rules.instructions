@@ -113,6 +113,63 @@ jira_search_fields keyword="status" → para obtener valores exactos del campo s
 
 **⚠️ IMPORTANTE**: El campo de estado en JIRA es SIEMPRE `status`, independientemente del nombre que aparezca en la interfaz web (puede mostrarse como "Estado", "Status", "Estado de la Iniciativa", etc., pero en JQL es siempre `status`)
 
+### 🎯 MAPEO OFICIAL DE ESTADOS JIRA (BASADO EN MCP ATLASSIAN)
+
+**📋 Campo de Estado Principal:**
+- **Campo oficial**: `status` (objeto con id, name, description, category)
+- **Categorías de estado**: "new" (To Do), "indeterminate" (In Progress), "done" (Done)
+
+**🔄 Estados Estándar del Workflow:**
+- **Abierto**: `status = 'Open'` (id: 1, category: "new")
+- **En Progreso**: `status = 'In Progress'` (id: 3, category: "indeterminate") 
+- **Cerrado**: `status = 'Closed'` (id: 6, category: "done")
+- **Desplegado**: `status = 'Deployed'` (id: 13301, category: "done")
+
+**🔍 Estados de Discovery y Análisis:**
+- **Discovery/Discovering** → `status = 'Solution drafting'` (id: 16496, category: "new")
+- **Análisis/Analyzing** → `status = 'Analyzing'` (si existe, category: "new")
+- **Validar Prioridad** → `status = 'Validate Priority'` (id: 18696, category: "new")
+
+**📚 Estados de Planificación y Backlog:**
+- **Backlog** → `status = 'Backlog'` (category: "new")
+- **Listo para empezar** → `status = 'Ready to Start'` (category: "new")
+- **Priorizado** → `status = 'Prioritized'` (category: "new")
+- **Refinamiento de Épica** → `status = 'Epic Refinement'` (category: "new")
+
+**⚙️ Estados de Desarrollo y Revisión:**
+- **Listo para verificar** → `status = 'Ready to Verify'` (category: "indeterminate")
+- **En revisión** → `status = 'In Review'` (si existe, category: "indeterminate")
+- **Aceptado** → `status = 'Accepted'` (si existe, category: "indeterminate")
+
+**🚀 Estados de Despliegue:**
+- **Para desplegar** → `status = 'To deploy'` (category: "indeterminate")
+- **Desplegado** → `status = 'Deployed'` (id: 13301, category: "done")
+
+**❌ Estados de Excepción:**
+- **Descartado** → `status = 'Discarded'` (category: "done")
+- **Retrasado** → `status = 'Delayed'` (category: "new")
+
+**📊 Campo Estado de Iniciativa (Específico):**
+- **Campo personalizado**: `customfield_21361` ("Estado Iniciativa")
+- **Uso**: Específico para Initiatives, puede estar vacío en issues regulares
+- **Consulta combinada**: Para Initiatives verificar tanto `status` como `customfield_21361`
+
+**🎯 Mapeo de Categorías por Estado:**
+- **To Do** (new): Open, Solution drafting, Validate Priority, Backlog, Ready to Start, Prioritized, Epic Refinement, Delayed
+- **In Progress** (indeterminate): In Progress, Ready to Verify, In Review, Accepted, To deploy
+- **Done** (done): Closed, Deployed, Discarded
+
+**🚨 REGLA CRÍTICA PARA DISCOVERY:**
+- **Cuando el usuario mencione "Discovery" o "Discovering"** → SIEMPRE mapear a `status = 'Solution drafting'`
+- **"Solution drafting"** representa la fase de descubrimiento/análisis en workflows de Inditex
+- **Incluye**: Recopilación de requisitos, diseño de solución, análisis inicial
+
+**🔧 PROCEDIMIENTO OBLIGATORIO PARA VERIFICACIÓN DE ESTADOS:**
+1. Usuario menciona estado → Ejecutar: `jira_search_fields keyword="[término]"`
+2. Identificar valor exacto de la respuesta MCP
+3. Usar SIEMPRE `status = '[valor_exacto_MCP]'` en JQL
+4. Confirmar mapeo aplicado con usuario
+
 #### Valores Comunes Adicionales
 - **Verticales**: 'Proveedor', 'Producto Terminado', 'Desarrollo de Producto', 'Dirección y Planificación','Ingeniería', 'Materias Primas', 'Plataforma'
 - **Prioridades**: 'High', 'Medium', 'Low', 'Critical'
