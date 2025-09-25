@@ -140,40 +140,60 @@ Instrucción Usuario → Traducción JQL → Ejecución Script → Reporte → A
 
 2. **Procesamiento automático por iniciativa:**
    - Acceder al campo `['children']` de cada iniciativa
-   - Extraer `description` de la iniciativa padre
-   - Para cada épica en children: extraer su `description`
-   - Ejecutar análisis semántico automático
+   - **USAR MCP ATLASSIAN OBLIGATORIO**: Recuperar `description` completa de la iniciativa padre vía `jira_get_issue`
+   - **USAR MCP ATLASSIAN OBLIGATORIO**: Para cada épica en children, recuperar su `description` completa vía `jira_get_issue`
+   - Ejecutar análisis semántico automático con descripciones completas de MCP
 
-3. **Evaluación automática (Escala 1-5):**
+3. **Evaluación automática (Escala 1-5) - CRITERIOS ESTRICTOS:**
    ```
-   🎯 ESCALA DE EVALUACIÓN AUTOMÁTICA:
+   🎯 ESCALA DE EVALUACIÓN AUTOMÁTICA ESTRICTA:
    
-   5️⃣ PERFECTAMENTE ALINEADO
-   - Épicas cubren 95-100% del scope de la iniciativa
-   - Sin gaps significativos ni overlaps
+   5️⃣ PERFECTAMENTE ALINEADO (98-100%)
+   - Épicas cubren exactamente el scope de la iniciativa
+   - Cobertura completa sin gaps ni sobrecobertura
+   - Alineación precisa entre descripción y descomposición
    
-   4️⃣ BIEN ALINEADO  
-   - Épicas cubren 80-94% del scope
-   - Gaps menores o overlaps mínimos
+   4️⃣ BIEN ALINEADO (90-97%)
+   - Épicas cubren casi todo el scope definido
+   - Gaps mínimos (<10%) o sobrecobertura leve
+   - Alineación clara con desviaciones menores
    
-   3️⃣ MODERADAMENTE ALINEADO
-   - Épicas cubren 60-79% del scope
-   - Algunos gaps o overlaps evidentes
+   3️⃣ MODERADAMENTE ALINEADO (75-89%)
+   - Cobertura parcial del scope definido
+   - Gaps moderados (10-25%) o sobrecobertura notable
+   - Algunas épicas desalineadas del objetivo principal
    
-   2️⃣ MAL ALINEADO
-   - Épicas cubren 40-59% del scope
-   - Gaps significativos o overlaps importantes
-   
-   1️⃣ COMPLETAMENTE DESALINEADO
-   - Épicas cubren <40% del scope
+   2️⃣ MAL ALINEADO (50-74%)
+   - Cobertura insuficiente o excesiva del scope
+   - Gaps importantes (25-50%) o sobrecobertura significativa
    - Desconexión evidente entre niveles
+   
+   1️⃣ COMPLETAMENTE DESALINEADO (<50%)
+   - Épicas no reflejan la iniciativa o la sobrepasan masivamente
+   - Desconexión total entre descripción y descomposición
+   - Fragmentación completa del alcance
    ```
 
-4. **Detección automática de patrones:**
-   - **SOBRE-EVALUACIÓN**: Iniciativa describe MÁS de lo que suman las épicas
-   - **INFRA-EVALUACIÓN**: Épicas suman MÁS de lo que describe la iniciativa
-   - **FRAGMENTACIÓN**: Épicas van en direcciones diferentes a la iniciativa
-   - **COHERENCIA**: Alineamiento natural entre descripción y descomposición
+4. **Detección automática de patrones de cobertura:**
+   - **INFRACOBERTURA**: Épicas cubren MENOS de lo definido en la iniciativa
+     - Gaps críticos en funcionalidades esenciales
+     - Objetivos principales sin descomponer en épicas
+     - Alcance subestimado en el nivel de épicas
+   
+   - **SOBRECOBERTURA**: Épicas cubren MÁS de lo definido en la iniciativa
+     - Épicas incluyen funcionalidades no mencionadas en la iniciativa
+     - Scope creep no documentado en el nivel superior
+     - Descomposición más ambiciosa que la definición original
+   
+   - **DESALINEACIÓN LATERAL**: Épicas van en direcciones diferentes
+     - Épicas abordan problemas no relacionados con la iniciativa
+     - Fragmentación total del foco estratégico
+     - Dispersión de esfuerzos sin coherencia central
+   
+   - **COHERENCIA PERFECTA**: Alineamiento natural y preciso
+     - Descomposición lógica y completa
+     - Cada épica contribuye directamente al objetivo
+     - Balance perfecto entre cobertura y enfoque
 
 ### Formato Ejecutivo Automático
 ```markdown
