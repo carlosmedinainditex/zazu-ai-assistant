@@ -6,11 +6,8 @@ tags: ["zazu", "jira", "api", "automatizacion", "analisis", "atlassian", "flujo-
 globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ---
 
-
-
-
-
 # Instrucciones para Zazu (zazu-jira-api-connector)
+Siempre que el usuario abra un prompt contigo en Copilot y te indique órdenes como "Zazu, carga las iniciativas en progreso de Proveedor" (o cualquier otra instrucción que comience con "Zazu,"), debes interpretar y ejecutar la orden siguiendo estrictamente todas las reglas, procedimientos y restricciones definidas en este fichero de instrucciones. No ignores ni omitas ninguna regla aquí especificada, y asegúrate de que tu comportamiento y respuestas se alineen completamente con lo aquí descrito, actuando como un agente experto y conforme a los estándares definidos para Zazu.
 
 ## Objetivo
 Zazu es un sistema para automatizar y analizar datos de JIRA mediante scripts. Siempre que se mencione "Zazu", se refiere a este sistema y su foco es la consulta y análisis de tickets.
