@@ -53,8 +53,32 @@ Instrucción Usuario → Traducción JQL → Ejecución Script → Reporte → A
 - **Estado** → `status = '[valor]'`
 - **Prioridad** → `priority = '[valor]'`
 
-#### Valores Comunes
-- **Estados**: 'Open', 'In Progress', 'Closed', 'Done', 'To Do'
+#### Estados de JIRA - Mapeo Oficial (USAR MCP ATLASSIAN OBLIGATORIO)
+**ANTES de usar cualquier estado en JQL, VERIFICAR con MCP Atlassian:**
+```
+jira_search_fields keyword="status" → para obtener valores exactos
+```
+
+**MAPEO CRÍTICO DE ESTADOS (Verificar siempre con MCP):**
+- **"descubrimiento"/"discovery"** → **VERIFICAR**: puede ser 'Discovery', 'Discovering', 'Research'
+- **"análisis"/"analyzing"** → **VERIFICAR**: puede ser 'Analyzing', 'Analysis', 'Under Analysis'
+- **"en progreso"/"in progress"** → **VERIFICAR**: 'In Progress', 'In Development', 'Development'
+- **"en desarrollo"/"developing"** → **VERIFICAR**: 'In Development', 'Development', 'Coding'
+- **"revisión"/"review"** → **VERIFICAR**: 'Review', 'In Review', 'Code Review', 'Peer Review'
+- **"testing"/"pruebas"** → **VERIFICAR**: 'Testing', 'In Testing', 'QA Testing', 'Ready for Testing'
+- **"listo"/"ready"** → **VERIFICAR**: 'Ready', 'Ready to Start', 'Ready for Development'
+- **"bloqueado"/"blocked"** → **VERIFICAR**: 'Blocked', 'On Hold', 'Impedimento'
+- **"hecho"/"done"** → **VERIFICAR**: 'Done', 'Completed', 'Resolved', 'Closed'
+- **"cancelado"/"cancelled"** → **VERIFICAR**: 'Cancelled', 'Rejected', 'Won\'t Do', 'Discarded'
+
+**PROCEDIMIENTO OBLIGATORIO para estados:**
+1. Usuario menciona estado (ej: "discovery", "análisis")
+2. **EJECUTAR MCP**: `jira_search_fields keyword="[término]"`
+3. **IDENTIFICAR** valor exacto de la respuesta MCP
+4. **USAR** valor exacto en JQL: `status = '[valor_exacto_MCP]'`
+5. **CONFIRMAR** con usuario el mapeo aplicado
+
+#### Valores Comunes Adicionales
 - **Verticales**: 'Proveedor', 'Cliente', 'Infraestructura', 'Plataforma'
 - **Prioridades**: 'High', 'Medium', 'Low', 'Critical'
 
@@ -174,42 +198,42 @@ Instrucción Usuario → Traducción JQL → Ejecución Script → Reporte → A
    - Fragmentación completa del alcance
    ```
 
-4. **Detección automática de patrones de cobertura:**
+4. **Detección automática de patrones con mensajes directos:**
    - **INFRACOBERTURA**: Épicas cubren MENOS de lo definido en la iniciativa
      - Gaps críticos en funcionalidades esenciales
      - Objetivos principales sin descomponer en épicas
-     - Alcance subestimado en el nivel de épicas
+     - **Mensajes directos**: "Iniciativa define más scope que las épicas", "Faltan épicas para cubrir iniciativa", "Épicas insuficientes vs iniciativa"
    
    - **SOBRECOBERTURA**: Épicas cubren MÁS de lo definido en la iniciativa
      - Épicas incluyen funcionalidades no mencionadas en la iniciativa
      - Scope creep no documentado en el nivel superior
-     - Descomposición más ambiciosa que la definición original
+     - **Mensajes directos**: "Épicas cubren más scope que iniciativa", "Scope creep en épicas vs iniciativa", "Épicas exceden definición de iniciativa"
    
    - **DESALINEACIÓN LATERAL**: Épicas van en direcciones diferentes
      - Épicas abordan problemas no relacionados con la iniciativa
      - Fragmentación total del foco estratégico
-     - Dispersión de esfuerzos sin coherencia central
+     - **Mensajes directos**: "Épicas desconectadas de iniciativa", "Falta coherencia entre iniciativa y épicas", "Épicas no alineadas con objetivo"
    
    - **COHERENCIA PERFECTA**: Alineamiento natural y preciso
      - Descomposición lógica y completa
      - Cada épica contribuye directamente al objetivo
-     - Balance perfecto entre cobertura y enfoque
+     - **Mensajes directos**: "Iniciativa y épicas perfectamente alineadas", "Descomposición coherente y completa", "Alcance equilibrado entre niveles"
 
 ### Formato Ejecutivo Automático
 ```markdown
-## � ANÁLISIS AUTOMÁTICO DE ALCANCES
+## 📊 ANÁLISIS AUTOMÁTICO DE ALCANCES
 
 ### 📊 RESUMEN EJECUTIVO CONSOLIDADO
-| Iniciativa | ID | Puntuación | Estado | Acción Crítica |
-|------------|----|-----------:|--------|----------------|
-| [Título]   | ID | X/5        | STATUS | ACCIÓN         |
+| Iniciativa | ID | Puntuación | Estado | Diagnóstico Directo |
+|------------|----|-----------:|--------|---------------------|
+| [[Título](https://jira.inditex.com/jira/browse/ID)] | ID | X/5 | STATUS | MENSAJE_DIRECTO |
 
 ### 🎯 EVALUACIONES INDIVIDUALES
 
-#### 📋 [INICIATIVA-ID]: [Título] → **X/5**
-- **Diagnóstico**: [SOBRE/INFRA/FRAGMENTADA/ALINEADA]  
-- **Gap crítico**: [Descripción específica del problema]
-- **Acción inmediata**: [1 acción concreta y específica]
+#### 📋 [INICIATIVA-ID]: [[Título](https://jira.inditex.com/jira/browse/INICIATIVA-ID)] → **X/5**
+- **Diagnóstico directo**: [MENSAJE_DIRECTO_ESPECÍFICO]  
+- **Tipo de problema**: [INFRACOBERTURA/SOBRECOBERTURA/DESALINEACIÓN/ALINEADO]
+- **Acción requerida**: [1 acción concreta y específica]
 - **Épicas analizadas**: X épicas procesadas
 
 ---
@@ -222,8 +246,35 @@ Instrucción Usuario → Traducción JQL → Ejecución Script → Reporte → A
 1. **Extracción**: `iniciativa['description']` vs `sum(epica['description'] for epica in iniciativa['children'])`
 2. **Análisis semántico**: Comparar alcance, objetivos, entregables mencionados
 3. **Cálculo de score**: Basado en cobertura, coherencia y completitud
-4. **Clasificación automática**: Asignar categoría (SOBRE/INFRA/FRAGMENTADA/ALINEADA)
-5. **Generación de acción**: Derivar 1 acción específica por iniciativa
+4. **Clasificación automática**: Asignar categoría (INFRACOBERTURA/SOBRECOBERTURA/DESALINEACIÓN/COHERENCIA)
+5. **Generación de mensaje directo**: Crear mensaje específico según patrón detectado
+6. **Generación de acción**: Derivar 1 acción específica por iniciativa
+
+### Biblioteca de Mensajes Directos
+**USAR ESTOS MENSAJES ESPECÍFICOS según el patrón:**
+- **INFRACOBERTURA**: 
+  - "Iniciativa define más scope que las épicas"
+  - "Faltan épicas para cubrir la iniciativa completamente"
+  - "Épicas insuficientes vs definición de iniciativa"
+  - "Gaps importantes entre iniciativa y épicas"
+
+- **SOBRECOBERTURA**:
+  - "Épicas cubren más scope que la iniciativa"
+  - "Scope creep en épicas vs iniciativa"
+  - "Épicas exceden la definición de iniciativa"
+  - "Épicas más ambiciosas que iniciativa"
+
+- **DESALINEACIÓN**:
+  - "Épicas desconectadas del objetivo de iniciativa"
+  - "Falta coherencia entre iniciativa y épicas"
+  - "Épicas no alineadas con el propósito principal"
+  - "Fragmentación total entre niveles"
+
+- **COHERENCIA PERFECTA**:
+  - "Iniciativa y épicas perfectamente alineadas"
+  - "Descomposición coherente y completa"
+  - "Alcance equilibrado entre niveles"
+  - "Alineación estratégica óptima"
 
 ### Reglas de Automatización
 - ✅ **NO preguntar** qué iniciativas analizar - procesar TODAS automáticamente
@@ -232,6 +283,8 @@ Instrucción Usuario → Traducción JQL → Ejecución Script → Reporte → A
 - ✅ **Identificar automáticamente** el tipo de desalineación
 - ✅ **Proponer UNA acción crítica** por iniciativa
 - ✅ **Presentar formato ejecutivo** consolidado
+- ✅ **FORMATO OBLIGATORIO de enlaces**: Todos los títulos de iniciativas DEBEN incluir enlace JIRA usando formato `[[Título](https://jira.inditex.com/jira/browse/INICIATIVA-ID)]`
+- ✅ **Extraer ID automáticamente**: Usar el campo `key` o `id` de cada iniciativa para construir la URL
 
 ---
 
