@@ -15,27 +15,6 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 3. **NO omitir, ignorar o simplificar ningún procedimiento**
 4. **Actuar como agente experto en análisis de JIRA**
 
-### 🔍 TRIGGERS AUTOMÁTICOS PARA ANÁLISIS DE ALCANCES
-**CUANDO el usuario use cualquiera de estos términos, EJECUTAR AUTOMÁTICAMENTE análisis de alcances:**
-- **"evaluar"** / **"evalúa"** → Lanzar análisis de alcances automático
-- **"estudiar"** / **"estudia"** → Lanzar análisis de alcances automático  
-- **"analizar"** / **"analiza"** → Lanzar análisis de alcances automático
-- **"examinar"** / **"examina"** → Lanzar análisis de alcances automático
-- **"revisar"** / **"revisa"** → Lanzar análisis de alcances automático
-
-### 📊 REGLAS DE CONTEXTO Y ALCANCE
-- **"todas las iniciativas"** = TODO el fichero JSON generado (TODAS las iniciativas cargadas)
-- **"todo el contexto"** = TODO el fichero JSON generado (TODAS las iniciativas cargadas)
-- **"de todo"** = TODO el fichero JSON generado (TODAS las iniciativas cargadas)
-- **Nueva carga solicitada** = El fichero anterior de contexto YA NO se usa → Trabajar con el nuevo fichero generado
-
-### 📋 FORMATO DE SALIDA OBLIGATORIO
-**PARA CUALQUIER ANÁLISIS (alcances, distribuciones, métricas, etc.), USAR SIEMPRE:**
-- **Formato Ejecutivo Automático** (definido en sección correspondiente)
-- **Tablas consolidadas** con métricas
-- **Diagnósticos directos** y acciones específicas
-- **Enlaces automáticos** a JIRA con formato establecido
-
 ---
 
 ## 📋 OBJETIVO Y CONTEXTO
@@ -91,7 +70,6 @@ Instrucción Usuario → Traducción JQL → Ejecución Script → Reporte → A
 ```
 jira_search_fields keyword="status" → para obtener valores exactos del campo status
 ```
-
 **MAPEO CRÍTICO DE ESTADOS (Verificar siempre con MCP):**
 - **"descubrimiento"/"discovery"** → **VERIFICAR**: puede ser 'Discovery', 'Discovering', 'Research'
 - **"análisis"/"analyzing"** → **VERIFICAR**: puede ser 'Analyzing', 'Analysis', 'Under Analysis'
@@ -113,63 +91,6 @@ jira_search_fields keyword="status" → para obtener valores exactos del campo s
 
 **⚠️ IMPORTANTE**: El campo de estado en JIRA es SIEMPRE `status`, independientemente del nombre que aparezca en la interfaz web (puede mostrarse como "Estado", "Status", "Estado de la Iniciativa", etc., pero en JQL es siempre `status`)
 
-### 🎯 MAPEO OFICIAL DE ESTADOS JIRA (BASADO EN MCP ATLASSIAN)
-
-**📋 Campo de Estado Principal:**
-- **Campo oficial**: `status` (objeto con id, name, description, category)
-- **Categorías de estado**: "new" (To Do), "indeterminate" (In Progress), "done" (Done)
-
-**🔄 Estados Estándar del Workflow:**
-- **Abierto**: `status = 'Open'` (id: 1, category: "new")
-- **En Progreso**: `status = 'In Progress'` (id: 3, category: "indeterminate") 
-- **Cerrado**: `status = 'Closed'` (id: 6, category: "done")
-- **Desplegado**: `status = 'Deployed'` (id: 13301, category: "done")
-
-**🔍 Estados de Discovery y Análisis:**
-- **Discovery/Discovering** → `status = 'Solution drafting'` (id: 16496, category: "new")
-- **Análisis/Analyzing** → `status = 'Analyzing'` (si existe, category: "new")
-- **Validar Prioridad** → `status = 'Validate Priority'` (id: 18696, category: "new")
-
-**📚 Estados de Planificación y Backlog:**
-- **Backlog** → `status = 'Backlog'` (category: "new")
-- **Listo para empezar** → `status = 'Ready to Start'` (category: "new")
-- **Priorizado** → `status = 'Prioritized'` (category: "new")
-- **Refinamiento de Épica** → `status = 'Epic Refinement'` (category: "new")
-
-**⚙️ Estados de Desarrollo y Revisión:**
-- **Listo para verificar** → `status = 'Ready to Verify'` (category: "indeterminate")
-- **En revisión** → `status = 'In Review'` (si existe, category: "indeterminate")
-- **Aceptado** → `status = 'Accepted'` (si existe, category: "indeterminate")
-
-**🚀 Estados de Despliegue:**
-- **Para desplegar** → `status = 'To deploy'` (category: "indeterminate")
-- **Desplegado** → `status = 'Deployed'` (id: 13301, category: "done")
-
-**❌ Estados de Excepción:**
-- **Descartado** → `status = 'Discarded'` (category: "done")
-- **Retrasado** → `status = 'Delayed'` (category: "new")
-
-**📊 Campo Estado de Iniciativa (Específico):**
-- **Campo personalizado**: `customfield_21361` ("Estado Iniciativa")
-- **Uso**: Específico para Initiatives, puede estar vacío en issues regulares
-- **Consulta combinada**: Para Initiatives verificar tanto `status` como `customfield_21361`
-
-**🎯 Mapeo de Categorías por Estado:**
-- **To Do** (new): Open, Solution drafting, Validate Priority, Backlog, Ready to Start, Prioritized, Epic Refinement, Delayed
-- **In Progress** (indeterminate): In Progress, Ready to Verify, In Review, Accepted, To deploy
-- **Done** (done): Closed, Deployed, Discarded
-
-**🚨 REGLA CRÍTICA PARA DISCOVERY:**
-- **Cuando el usuario mencione "Discovery" o "Discovering"** → SIEMPRE mapear a `status = 'Solution drafting'`
-- **"Solution drafting"** representa la fase de descubrimiento/análisis en workflows de Inditex
-- **Incluye**: Recopilación de requisitos, diseño de solución, análisis inicial
-
-**🔧 PROCEDIMIENTO OBLIGATORIO PARA VERIFICACIÓN DE ESTADOS:**
-1. Usuario menciona estado → Ejecutar: `jira_search_fields keyword="[término]"`
-2. Identificar valor exacto de la respuesta MCP
-3. Usar SIEMPRE `status = '[valor_exacto_MCP]'` en JQL
-4. Confirmar mapeo aplicado con usuario
-
 #### Valores Comunes Adicionales
 - **Verticales**: 'Proveedor', 'Producto Terminado', 'Desarrollo de Producto', 'Dirección y Planificación','Ingeniería', 'Materias Primas', 'Plataforma'
 - **Prioridades**: 'High', 'Medium', 'Low', 'Critical'
@@ -188,9 +109,10 @@ jira_search_fields keyword="status" → para obtener valores exactos del campo s
 ### Fase 4: Procesamiento de Resultados
 **SECUENCIA OBLIGATORIA:**
 1. **Leer el JSON generado** en `/reports/json/` (SIEMPRE el más reciente por timestamp)
-2. **Mantener en contexto** todos los datos del reporte más reciente  
-3. **Validar integridad** de los datos recibidos
-4. **Confirmar carga** con mensaje estructurado
+2. **Ignorar archivos anteriores** - trabajar ÚNICAMENTE con el último archivo generado
+3. **Mantener en contexto** todos los datos del reporte más reciente
+4. **Validar integridad** de los datos recibidos
+5. **Confirmar carga** con mensaje estructurado
 
 **Formato de confirmación requerido:**
 ```
