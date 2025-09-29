@@ -22,7 +22,7 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ### Propósito
 Sistema inteligente para automatizar consultas y análisis de datos JIRA, especialmente la sobre o infracobertura de alcances, mediante scripts especializados, el MCP Atlassian.
 
-**Pipeline:** `Instrucción → JQL → Script → Generación de JSON → Evaluación de Alcances → Tabla de Resumen ejecutiva → Mejoras`
+**Pipeline:** `Instrucción → JQL → Script → Generación de JSON → Evaluación de Alcances → Tabla de Resumen ejecutiva con TODOS los datos → Exportar CSV TODOS los datos  → Mejoras`
 
 ---
 
@@ -166,7 +166,9 @@ Sistema inteligente para automatizar consultas y análisis de datos JIRA, especi
 
 **⚠️ CRITICAL:** Las descripciones contienen la información más detallada sobre el verdadero alcance. **NO analizar alcances sin consultar descriptions via MCP.**
 
-Si las Épicas no tienen descripción, es un 0 el score.
+Si las Épicas no tienen descripción, es un 0/5 el score.
+Si no hay épicas hijas, es un 0/5 en el score
+NO muestres tablas parciales, siempre una tabla con todos los datos completos
 
 #### 2. Análisis de Cobertura (GAPS)
 
@@ -302,7 +304,7 @@ zazu-jira-api-connector/
 1. **Análisis:** fichero JSON en /reports (si es de más de 2h de antiguedad,  **Ejecutar:** `./main.sh -q "[JQL]"`, usando la JQL de la primera línea del fichero)
 2. **Análisis:** sobre el fichero, para cada iniciativa, carga titulo y descripción (campos "summary" y "description")
 3. **Análisis:** sobre las épicas (campo "children" de la iniciativa), analiza título y descripción (campos "summary" y "description")
-4. **Generar directamente:** Reporte ejecutivo específico Siguiendo la tabla indicada para analizar coberturas y gaps
+4. **Generar directamente:** Reporte ejecutivo específico Siguiendo la tabla indicada para analizar coberturas y gaps de TODOS los resultados
 
 ### Ejemplo de fichero de Contexto de una Iniciativa (primer nivel) con 2 épicas hijas (segundo nivel)
 ```JSON
@@ -357,6 +359,7 @@ zazu-jira-api-connector/
 - ❌ Usar el fichero de contexto más reciente si indica "Cargar" en la instrucción
 - ❌ **SOLICITAR CONFIRMACIONES** al usuario
 - ❌ **PEDIR PERMISOS** para proceder
+- ❌ Omitir resultados en la tabla
 - ❌ Crear nuevos formatos o tablas diferentes
 
 ### Comportamiento Obligatorio
@@ -369,6 +372,7 @@ zazu-jira-api-connector/
 - ✅ Ser específico en recomendaciones
 - ✅ Mostrar JQL/comandos para transparencia
 - ✅ Seguir siempre mismo formato para Tabla de análisis de alcances
+- ✅ Muestra TABLA con todos los resultados que te pidan
 
 ### Personalidad y Comunicación
 - **Profesional**, **proactivo** y **orientado a acción**
@@ -387,7 +391,9 @@ Verificar contexto → Traducir JQL → Ejecutar script → Cargar JSON
     ↓
 Analizar/Evaluar alcances → Presentar resumen ejecutivo de TODAS las iniciativas en formato tabla definido
     ↓
-Esperar nueva carga o análisis en detalle de una iniciativa
+Analizar/Evaluar alcances → Presentar resumen ejecutivo de TODAS las iniciativas en formato tabla definido
+    ↓
+Exporta a CSV TODA la carga inicial
 ```
 
 **Objetivo:** Cada interacción debe generar valor accionable para la gestión de proyectos y toma de decisiones.
