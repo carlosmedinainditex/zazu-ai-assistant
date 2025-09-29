@@ -23,10 +23,18 @@ def build_parser():
     parser.add_argument("--max-results", type=int, default=50, help="Maximum number of results to return (default: 50)")
     return parser
 
-def extract_required_fields(issue):
+def extract_required_fields(issue, is_initiative=True):
+    """
+    Extract required fields from a Jira issue.
+    
+    Args:
+        issue: Jira issue data
+        is_initiative: True if this is an initiative (parent), False if it's a child (epic)
+    """
     fields = issue.get('fields', {})
-    return {
+    result = {
         "id": issue.get('key'),
+        "project": fields.get('project', {}).get('key', '') if fields.get('project') else '',
         "summary": fields.get('summary', ''),
         "description": fields.get('description', ''),
         "status": fields.get('status', {}).get('name', ''),
@@ -34,10 +42,14 @@ def extract_required_fields(issue):
         "reporter": (fields.get('reporter', {}) or {}).get('displayName', '') if fields.get('reporter') else '',
         "created": fields.get('created', ''),
         "duedate": fields.get('duedate', ''),
-        "owner": fields.get('customfield_43462', '') if fields.get('customfield_43462') else '',
-        "affected": fields.get('customfield_43463', '')if fields.get('customfield_43463') else ''
-       
     }
+    
+    # Only add owner and affected fields for initiatives, not for children (epics)
+    if is_initiative:
+        result["owner"] = fields.get('customfield_43462', '') if fields.get('customfield_43462') else ''
+        result["affected"] = fields.get('customfield_43463', '') if fields.get('customfield_43463') else ''
+    
+    return result
 
 def main():
     parser = build_parser()
@@ -57,7 +69,7 @@ def main():
         logger.error("No JQL query provided and no DEFAULT_JQL in .env")
         return 1
 
-    fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description", "customfield_43462", "customfield_43463"]
+    fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description", "project", "customfield_43462", "customfield_43463"]
 
     results = execute_jql(
         jql_query=jql_query,
@@ -86,7 +98,7 @@ def get_children_tickets(issue_key):
     results = execute_jql(f'"Parent Link" = {issue_key}', max_results=100)
     formatted_results = []
     for issue in results:
-        formatted_results.append(extract_required_fields(issue))
+        formatted_results.append(extract_required_fields(issue, is_initiative=False))
     return formatted_results
 
 def execute_jql(jql_query, max_results=50, fields=None):
@@ -104,7 +116,7 @@ def execute_jql(jql_query, max_results=50, fields=None):
         logger.info(f"Executing JQL query: {jql_query}")
 
         if not fields:
-            fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description", "customfield_43462","customfield_43463"]
+            fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description", "project", "customfield_43462","customfield_43463"]
         params = {
             "jql": jql_query,
             "maxResults": max_results,
