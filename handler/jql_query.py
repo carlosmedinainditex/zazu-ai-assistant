@@ -27,13 +27,15 @@ def extract_required_fields(issue):
     fields = issue.get('fields', {})
     return {
         "id": issue.get('key'),
-        "title": fields.get('summary', ''),
+        "title": fields.get('title', ''),
         "description": fields.get('description', ''),
         "status": fields.get('status', {}).get('name', ''),
         "assignee": (fields.get('assignee', {}) or {}).get('displayName', '') if fields.get('assignee') else '',
         "reporter": (fields.get('reporter', {}) or {}).get('displayName', '') if fields.get('reporter') else '',
         "created": fields.get('created', ''),
-        "duedate": fields.get('duedate', '')
+        "duedate": fields.get('duedate', ''),
+        "affected": fields.get('Product/Enabler - Affected', '')
+
     }
 
 def main():
@@ -54,13 +56,15 @@ def main():
         logger.error("No JQL query provided and no DEFAULT_JQL in .env")
         return 1
 
-    fields = ["summary", "status", "assignee", "reporter", "created", "duedate"]
+    fields = ["title", "status", "assignee", "reporter", "created", "duedate", "description", "affected"]
 
     results = execute_jql(
         jql_query=jql_query,
         max_results=args.max_results,
         fields=fields
     )
+    logger.info(f"JQL query results: {results}")
+    
     nested = []
     for issue in results:
         entry = extract_required_fields(issue)
@@ -98,10 +102,9 @@ def execute_jql(jql_query, max_results=50, fields=None):
             jira_server = jira_server[:-1]
         api_url = f"{jira_server}/rest/api/2/search"
         logger.info(f"Executing JQL query: {jql_query}")
-        logger.info(f"Maximum results: {max_results}")
-        
+
         if not fields:
-            fields = ["summary", "status", "assignee", "updated", "created", "priority", "issuetype"]
+            fields = ["title", "status", "assignee", "reporter", "created", "duedate", "description", "affected"]
         params = {
             "jql": jql_query,
             "maxResults": max_results,
