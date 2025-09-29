@@ -27,13 +27,16 @@ def extract_required_fields(issue):
     fields = issue.get('fields', {})
     return {
         "id": issue.get('key'),
-        "title": fields.get('summary', ''),
+        "summary": fields.get('summary', ''),
         "description": fields.get('description', ''),
         "status": fields.get('status', {}).get('name', ''),
         "assignee": (fields.get('assignee', {}) or {}).get('displayName', '') if fields.get('assignee') else '',
         "reporter": (fields.get('reporter', {}) or {}).get('displayName', '') if fields.get('reporter') else '',
         "created": fields.get('created', ''),
-        "duedate": fields.get('duedate', '')
+        "duedate": fields.get('duedate', ''),
+        "owner": fields.get('customfield_43462', '') if fields.get('customfield_43462') else '',
+        "affected": fields.get('customfield_43463', '')if fields.get('customfield_43463') else ''
+       
     }
 
 def main():
@@ -54,13 +57,14 @@ def main():
         logger.error("No JQL query provided and no DEFAULT_JQL in .env")
         return 1
 
-    fields = ["summary", "status", "assignee", "reporter", "created", "duedate"]
+    fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description", "customfield_43462", "customfield_43463"]
 
     results = execute_jql(
         jql_query=jql_query,
         max_results=args.max_results,
         fields=fields
     )
+    
     nested = []
     for issue in results:
         entry = extract_required_fields(issue)
@@ -79,9 +83,11 @@ def main():
 logger = logging.getLogger("JqlQuery")
 
 def get_children_tickets(issue_key):
-    logger.info(f"entro en epicas de {issue_key}")
     results = execute_jql(f'"Parent Link" = {issue_key}', max_results=100)
-    return results
+    formatted_results = []
+    for issue in results:
+        formatted_results.append(extract_required_fields(issue))
+    return formatted_results
 
 def execute_jql(jql_query, max_results=50, fields=None):
     try:
@@ -96,10 +102,9 @@ def execute_jql(jql_query, max_results=50, fields=None):
             jira_server = jira_server[:-1]
         api_url = f"{jira_server}/rest/api/2/search"
         logger.info(f"Executing JQL query: {jql_query}")
-        logger.info(f"Maximum results: {max_results}")
-        
+
         if not fields:
-            fields = ["summary", "status", "assignee", "updated", "created", "priority", "issuetype"]
+            fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description", "customfield_43462","customfield_43463"]
         params = {
             "jql": jql_query,
             "maxResults": max_results,
