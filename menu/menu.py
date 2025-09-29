@@ -40,18 +40,13 @@ def run_jql_query():
     max_results = input("Maximum results [50]: ")
     max_results = max_results if max_results else "50"
     
-    # Default to table format for the shell version
-    output_format = input("Output format [mdtable]: ")
-    output_format = "mdtable"
-    print(f"{YELLOW}Using table format for output{NC}")
-    
     print(f"{BLUE}Running JQL query...{NC}")
     cmd_args = []
     if jql_query:
         # Don't use shlex.quote for JQL queries as it can interfere with syntax
         cmd_args.append(jql_query)
     
-    cmd_args.extend(["--max-results", max_results, "-o", output_format])
+    cmd_args.extend(["--max-results", max_results])
     
     run_script(SCRIPT_DIR / "handler" / "jql_query.py", *cmd_args)
     
@@ -64,13 +59,9 @@ def query_issue():
         print(f"{RED}No valid issue key provided.{NC}")
         input(f"{YELLOW}Press ENTER to continue...{NC}")
         return
-    
-    # Always use detailed format
-    output_format = "detailed"
-    print(f"{YELLOW}Using detailed format for output{NC}")
-    
+
     print(f"{BLUE}Querying issue {issue_key}...{NC}")
-    run_script(SCRIPT_DIR / "handler" / "issue_query.py", issue_key, "-o", output_format)
+    run_script(SCRIPT_DIR / "handler" / "issue_query.py", issue_key)
 
 # Función diagnosis_menu eliminada en favor de llamar directamente al diagnóstico completo
 

@@ -26,13 +26,12 @@ logging.basicConfig(
 
 logger = logging.getLogger("JiraIssue")
 
-def get_issue(issue_key, expand=None):
+def get_issue(issue_key):
     """
     Gets information about a specific Jira issue.
     
     Args:
         issue_key (str): Key of the issue to get (eg: PROJ-123)
-        expand (list): Fields to expand in the response
         
     Returns:
         dict: Issue information, or None if there's an error
@@ -58,8 +57,6 @@ def get_issue(issue_key, expand=None):
         
         # Query parameters
         params = {}
-        if expand:
-            params["expand"] = ",".join(expand)
         
         # Headers with Bearer token
         headers = {
@@ -208,10 +205,6 @@ def main():
         help="Key of the issue to query (eg: PROJ-123)"
     )
     
-    parser.add_argument(
-        "-e", "--expand",
-        help="Fields to expand in the response, separated by commas (eg: changelog,transitions)"
-    )
     
     parser.add_argument(
         "-o", "--output",
@@ -233,13 +226,8 @@ def main():
         logger.error("Could not load environment variables.")
         return 1
     
-    # Process fields to expand
-    expand_fields = None
-    if args.expand:
-        expand_fields = [f.strip() for f in args.expand.split(",")]
-    
     # Get and show issue
-    issue_data = get_issue(args.issue_key, expand_fields)
+    issue_data = get_issue(args.issue_key)
     
     if issue_data:
         show_issue(issue_data, args.output)
