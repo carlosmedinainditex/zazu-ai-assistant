@@ -222,7 +222,7 @@ Sistema inteligente para automatizar consultas y análisis de datos JIRA mediant
 ### RESUMEN EJECUTIVO
 | Iniciativa | Score | Gaps | Extras | Acción |
 |------------|-------|------|--------|---------|
-| [[Título](URL)] | X/5 (Y%) | X | X | [ACCIÓN] |
+| [[Título](https://jira.inditex.com/jira/browse/[ID_TICKET])] | X/5 (Y%) | X | X | [ACCIÓN] |
 ```
 
 ---
