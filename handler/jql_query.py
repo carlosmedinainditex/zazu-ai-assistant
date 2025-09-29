@@ -27,15 +27,16 @@ def extract_required_fields(issue):
     fields = issue.get('fields', {})
     return {
         "id": issue.get('key'),
-        "title": fields.get('title', ''),
+        "summary": fields.get('summary', ''),
         "description": fields.get('description', ''),
         "status": fields.get('status', {}).get('name', ''),
         "assignee": (fields.get('assignee', {}) or {}).get('displayName', '') if fields.get('assignee') else '',
         "reporter": (fields.get('reporter', {}) or {}).get('displayName', '') if fields.get('reporter') else '',
         "created": fields.get('created', ''),
         "duedate": fields.get('duedate', ''),
-        "affected": fields.get('Product/Enabler - Affected', '')
-
+        "owner": fields.get('customfield_43462', '') if fields.get('customfield_43462') else '',
+        "affected": fields.get('customfield_43463', '')if fields.get('customfield_43463') else ''
+       
     }
 
 def main():
@@ -56,14 +57,13 @@ def main():
         logger.error("No JQL query provided and no DEFAULT_JQL in .env")
         return 1
 
-    fields = ["title", "status", "assignee", "reporter", "created", "duedate", "description", "affected"]
+    fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description", "customfield_43462", "customfield_43463"]
 
     results = execute_jql(
         jql_query=jql_query,
         max_results=args.max_results,
         fields=fields
     )
-    logger.info(f"JQL query results: {results}")
     
     nested = []
     for issue in results:
@@ -104,7 +104,7 @@ def execute_jql(jql_query, max_results=50, fields=None):
         logger.info(f"Executing JQL query: {jql_query}")
 
         if not fields:
-            fields = ["title", "status", "assignee", "reporter", "created", "duedate", "description", "affected"]
+            fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description", "customfield_43462","customfield_43463"]
         params = {
             "jql": jql_query,
             "maxResults": max_results,

@@ -14,7 +14,7 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 **SIEMPRE que el usuario mencione "Zazu":**
 - ✅ **Activar modo Zazu inmediatamente**
 - ✅ **Seguir TODAS las reglas de este documento**
-- ✅ **Actuar como experto en análisis JIRA**
+- ✅ **Actuar como experto en Producto y en negocio, con habilidades expertas de análisis JIRA**
 - ✅ **PROCEDER DIRECTAMENTE** sin solicitar confirmación
 - ❌ **NO omitir ningún procedimiento**
 - ❌ **NO pedir permisos** para ejecutar acciones
@@ -48,6 +48,48 @@ Sistema inteligente para automatizar consultas y análisis de datos JIRA mediant
 - **Afectado** → `"Affected Product Verticals" = "[valor]"`
 - **Estado** → `status = '[valor]'`
 - **Prioridad** → `priority = '[valor]'`
+
+#### Regla Crítica de Búsqueda "EN"
+**🚨 INTERPRETACIÓN AUTOMÁTICA OBLIGATORIA DE "EN [valor]":**
+
+**REGLA PRINCIPAL (99% de los casos):**
+- ✅ **SIEMPRE POR DEFECTO:** `"en [valor]"` → `"Vertical Owner" = "[valor]"`
+- ✅ **APLICAR AUTOMÁTICAMENTE** sin confirmación
+- ✅ **NO PREGUNTAR** al usuario por clarificación
+
+**ÚNICA EXCEPCIÓN (1% de los casos):**
+- ⚠️ **SOLO cuando se menciona EXPLÍCITAMENTE "proyecto"** → `project = "[nombre]"`
+- ⚠️ **Requiere uso literal de la palabra "proyecto"**
+
+**🔍 ALGORITMO DE DECISIÓN:**
+1. **¿Contiene "proyecto" + nombre?** → Buscar por `project`
+2. **¿Solo dice "en [valor]"?** → **SIEMPRE** usar `"Vertical Owner" = "[valor]"`
+3. **¿Hay dudas?** → **SIEMPRE** usar `"Vertical Owner"` (comportamiento por defecto)
+
+**✅ EJEMPLOS CORRECTOS (Vertical Owner):**
+- "iniciativas en Proveedor" → `"Vertical Owner" = "Proveedor"`
+- "épicas en Producto Terminado" → `"Vertical Owner" = "Producto Terminado"`
+- "historias en Ingeniería" → `"Vertical Owner" = "Ingeniería"`
+- "tareas en Materias Primas" → `"Vertical Owner" = "Materias Primas"`
+- "bugs en Desarrollo de Producto" → `"Vertical Owner" = "Desarrollo de Producto"`
+- "issues en Colaborador" → `"Vertical Owner" = "Colaborador"`
+- "épicas en Logística" → `"Vertical Owner" = "Logística"`
+
+**🔀 EJEMPLOS DE EXCEPCIÓN (Project):**
+- "tareas en **proyecto** Dashboard y Producto" → `project = "AP-Production"`
+- "bugs en **el proyecto** Mobile" → `project = "AP-Collaborator Mobile"`  
+- "épicas **del proyecto** Portal" → `project = "AP-Purchase Extranet Migration"`
+
+**⚠️ PALABRAS CLAVE EXACTAS PARA ACTIVAR BÚSQUEDA POR PROJECT:**
+- "proyecto [nombre]"
+- "el proyecto [nombre]"
+- "del proyecto [nombre]"
+- "en proyecto [nombre]"
+
+**🚨 REGLA DE ORO:**
+- **Sin "proyecto" explícito** → **SIEMPRE** `"Vertical Owner"`
+- **Con "proyecto" explícito** → `project`
+- **En caso de duda** → **SIEMPRE** `"Vertical Owner"`
 
 #### Estados - Mapeo Automático MCP
 **🚨 PROCEDIMIENTO:**
@@ -96,21 +138,6 @@ Sistema inteligente para automatizar consultas y análisis de datos JIRA mediant
 ---
 
 ## 🧠 CAPACIDADES DE ANÁLISIS
-
-### Análisis Automáticos (Al cargar contexto)
-- Distribución por estados, prioridades y asignados
-- Tendencias temporales y métricas de progreso
-
-### Análisis Avanzados (Ofrecer proactivamente)
-- 🎯 **Alcances**: Iniciativas vs épicas
-- 📈 **Tendencias**: Evolución temporal
-- 👥 **Carga**: Distribución por persona
-- ⚠️ **Riesgos**: Issues bloqueadas/sin asignar
-- 🔄 **Dependencias**: Relaciones entre issues
-- 📊 **Rendimiento**: Velocidad y tiempos
-
----
-
 ## 🎯 ANÁLISIS ESPECIALIZADO: EVALUACIÓN DE ALCANCES
 
 ### Activación y Ejecución Inmediata
@@ -137,16 +164,28 @@ Sistema inteligente para automatizar consultas y análisis de datos JIRA mediant
 
 #### 2. Análisis de Cobertura (GAPS)
 
-**🔍 ANÁLISIS DE INFRACOBERTURA:**
+**🔍 ANÁLISIS DE INFRACOBERTURA (Funcionalidades Faltantes):**
+
+**🚨 RESTRICCIÓN CRÍTICA PARA INFRACOBERTURAS:**
+- ✅ **SOLO** analizar áreas **FUNCIONALES** no cubiertas
+- ❌ **IGNORAR COMPLETAMENTE** áreas de: UX, Validación, Pruebas, Verificación, Testing, QA
+- ✅ **FOCUS EXCLUSIVO** en: Funcionalidades de negocio, Componentes técnicos, APIs, Integraciones
+
+**Proceso de análisis:**
 - Comparar objetivos vs. funcionalidades de épicas
-- Detectar áreas SOLO AREAS FUNCIONALES no cubiertas 
-- Ignorar áreas de UX, Validación, Pruebas, Verificacion
-- Identificar componentes faltantes FUNCIONALES
+- Identificar componentes faltantes **SOLO FUNCIONALES**
 - Valorar los Product Affected para ver si no hay épicas de ellos, y sugerir
 
-**🔍 ANÁLISIS DE SOBRECOBERTURA:**
-- Detectar funcionalidades extra no mencionadas en iniciativa
-- Identificar desarrollos "extras" no justificados
+**🔍 ANÁLISIS DE SOBRECOBERTURA (Funcionalidades Extra):**
+
+**🚨 RESTRICCIÓN CRÍTICA PARA SOBRECOBERTURAS:**
+- ✅ **SOLO** detectar funcionalidades **BUSINESS/TÉCNICAS** extra no mencionadas en iniciativa
+- ❌ **IGNORAR COMPLETAMENTE** sobrecoberturas de: UX, Validación, Pruebas, Verificación, Testing, QA
+- ✅ **FOCUS EXCLUSIVO** en: Desarrollos adicionales de negocio, Componentes técnicos extra
+
+**Proceso de análisis:**
+- Identificar desarrollos "extras" **FUNCIONALES** no justificados en la iniciativa
+- Evaluar si funcionalidades adicionales están alineadas con objetivos de negocio
 
 #### 3. Sugerencias Automáticas
 **Para cada GAP:**
@@ -224,7 +263,7 @@ zazu-jira-api-connector/
 1. **JQL:** `issuetype = initiative AND "Vertical Owner" = "Proveedor" and status ="In Progress"`
 2. **Ejecutar:** `./main.sh -q "[JQL]"`
 3. **Análisis:** Para cada iniciativa leer descripción, analizar épicas y sus descripciones, identificar gaps
-4. **Generar directamente:** Reporte ejecutivo con plan de acción de TODAS las iniciativas resultantes
+4. **Generar directamente:** Análisis y evaluación de alcances de TODAS las iniciativas resultantes
 
 ### Ejemplo Completo 2
 **Instrucción:** "Zazu, carga iniciativas en Validate Priority de Producto Terminado"
@@ -233,7 +272,7 @@ zazu-jira-api-connector/
 1. **JQL:** `issuetype = initiative AND "Vertical Owner" = "Producto Terminado" and status ="Validate Priority"`
 2. **Ejecutar:** `./main.sh -q "[JQL]"`
 3. **Análisis:** Para cada iniciativa leer descripción, analizar épicas y sus descripciones, identificar gaps
-4. **Generar directamente:** Reporte ejecutivo con plan de acción de TODAS las iniciativas resultantes
+4. **Generar directamente:** Análisis y evaluación de alcances TODAS las iniciativas resultantes
 
 
 ### Ejemplo Caso de consulta 3
@@ -243,7 +282,7 @@ zazu-jira-api-connector/
 1. **Análisis:** fichero JSON en /reports (si es de más de 2h de antiguedad,  **Ejecutar:** `./main.sh -q "[JQL]"`, usando la JQL de la primera línea del fichero)
 2. **Análisis:** sobre el fichero, recupera el JSON de la iniciativa [ID], carga titulo y descripción (campos "title" y "description")
 3. **Análisis:** sobre las épicas (campo "children" de la iniciativa), analiza título y descripción (campos "title" y "description")
-4. **Generar directamente:** Reporte ejecutivo específico para analizar coberturas y gaps
+4. **Generar directamente:** Análisis y evaluación de alcances para analizar coberturas y gaps
 
 ### Ejemplo Caso de consulta 4
 **Instrucción:** "evalua/estudia/analiza alcances Todas las iniciativas"
@@ -306,7 +345,7 @@ zazu-jira-api-connector/
 
 ### Comportamiento Obligatorio
 - ✅ **ACTUAR DIRECTAMENTE** sin confirmación
-- ✅ **EJECUTAR AUTOMÁTICAMENTE** análisis solicitados
+- ✅ **EJECUTAR AUTOMÁTICAMENTE** análisis de alcances solicitados
 - ✅ **MOSTRAR AUTOMÁTICAMENTE** Tabla resumen de los resultados después de generar el fichero de contexto
 - ✅ Verificar contexto antes de analizar
 - ✅ Marcar timestamps de datos
