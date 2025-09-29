@@ -72,8 +72,8 @@ Sistema inteligente para automatizar consultas y análisis de datos JIRA mediant
 - "historias en Ingeniería" → `"Vertical Owner" = "Ingeniería"`
 - "tareas en Materias Primas" → `"Vertical Owner" = "Materias Primas"`
 - "bugs en Desarrollo de Producto" → `"Vertical Owner" = "Desarrollo de Producto"`
-- "issues en Colaborador" → `"Vertical Owner" = "Colaborador"`
-- "épicas en Logística" → `"Vertical Owner" = "Logística"`
+- "issues en Dirección" → `"Vertical Owner" = "Dirección y Planificación"`
+- "épicas en Plataforma" → `"Vertical Owner" = "Plataforma"`
 
 **🔀 EJEMPLOS DE EXCEPCIÓN (Project):**
 - "tareas en **proyecto** Dashboard y Producto" → `project = "AP-Production"`
@@ -162,11 +162,14 @@ Sistema inteligente para automatizar consultas y análisis de datos JIRA mediant
 
 **⚠️ CRITICAL:** Las descripciones contienen la información más detallada sobre el verdadero alcance. **NO analizar alcances sin consultar descriptions via MCP.**
 
+Si las Épicas no tienen descripción, es un 0 el score
+
 #### 2. Análisis de Cobertura (GAPS)
 
 **🔍 ANÁLISIS DE INFRACOBERTURA (Funcionalidades Faltantes):**
 
 **🚨 RESTRICCIÓN CRÍTICA PARA INFRACOBERTURAS:**
+- ✅ Si **NO** hay épicas hijas, mostrar 0
 - ✅ **SOLO** analizar áreas **FUNCIONALES** no cubiertas
 - ❌ **IGNORAR COMPLETAMENTE** áreas de: UX, Validación, Pruebas, Verificación, Testing, QA
 - ✅ **FOCUS EXCLUSIVO** en: Funcionalidades de negocio, Componentes técnicos, APIs, Integraciones
@@ -184,7 +187,7 @@ Sistema inteligente para automatizar consultas y análisis de datos JIRA mediant
 - ✅ **FOCUS EXCLUSIVO** en: Desarrollos adicionales de negocio, Componentes técnicos extra
 
 **Proceso de análisis:**
-- Identificar desarrollos "extras" **FUNCIONALES** no justificados en la iniciativa
+- Identificar desarrollos "extras" **FUNCIONALES** no justificados en el alcance original de la iniciativa
 - Evaluar si funcionalidades adicionales están alineadas con objetivos de negocio
 
 #### 3. Sugerencias Automáticas
@@ -195,6 +198,7 @@ Sistema inteligente para automatizar consultas y análisis de datos JIRA mediant
 #### [ÁREA] - Epic [NÚMERO]
 - **Título**: "[Descripción del gap]"
 - **Justificación**: [Por qué es necesaria]
+- **Descripción de alcance**: [Alcance a abordar en la épica]
 - **Equipo Owner**: [Basado en patrones]
 - **Dependencias**: [Épicas relacionadas]
 ```
@@ -203,8 +207,8 @@ Sistema inteligente para automatizar consultas y análisis de datos JIRA mediant
 ```markdown
 ### ⚠️ FUNCIONALIDADES ADICIONALES
 
-#### En épica: [TÍTULO]
-- **Funcionalidad extra**: [Descripción]
+#### En épica: [TÍTULO] [ID_TICKET]
+- **Funcionalidad extra encontrada**: [Descripción]
 - **Recomendación**: [Mantener/Revisar/Eliminar]
 ```
 
@@ -361,7 +365,7 @@ zazu-jira-api-connector/
 - **Usar emojis** para legibilidad
 - **Estructurar** respuestas claramente
 - **Incluir métricas** numéricas
-- **Seguir SIEMPRE** la plantilla de tabla resumen
+- **Seguir SIEMPRE** la tabla resumen de análisis de alcances
 
 ### Pipeline Completo
 ```
