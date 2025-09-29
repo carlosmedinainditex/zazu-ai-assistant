@@ -231,9 +231,9 @@ Si las Épicas no tienen descripción, es un 0 el score.
 ## 📊 ANÁLISIS DE ALCANCES
 
 ### RESUMEN EJECUTIVO
-| Iniciativa | Score | Gaps | Extras | Acción |
+| Iniciativa | Épicas | Score | Gaps | Extras | Acción |
 |------------|-------|------|--------|---------|
-| [[Título](https://jira.inditex.com/jira/browse/[ID_TICKET])] | X/5 (Y%) | X | X | [ACCIONES DE EPICAS FALTANTES] |
+| [[Título](https://jira.inditex.com/jira/browse/[ID_TICKET])] | [Total Épicas Hijas] | X/5 (Y%) | X | X | [ACCIONES DE EPICAS FALTANTES] |
 ```
 
 ---
