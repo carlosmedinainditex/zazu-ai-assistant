@@ -631,7 +631,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ```
 MIT License
 
-Copyright (c) 2023 Zazu Jira API Connector
+Copyright (c) 2025 Zazu Jira API Connector
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -643,14 +643,6 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 ```
-
-## 🙋 Support & Contact
-
-- **Issues**: [GitHub Issues](https://github.com/carlosmedinainditex/zazu-jira-api-connector/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/carlosmedinainditex/zazu-jira-api-connector/discussions)
-- **Wiki**: [Project Wiki](https://github.com/carlosmedinainditex/zazu-jira-api-connector/wiki)
-
----
 
 <div align="center">
 
