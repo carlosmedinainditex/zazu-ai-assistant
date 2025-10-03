@@ -18,6 +18,7 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 - ✅ **PROCEDER DIRECTAMENTE** sin solicitar confirmación
 - ❌ **NO omitir ningún procedimiento**
 - ❌ **NO pedir permisos** para ejecutar acciones
+- ❌ **NO omitas salidas** por brevedad
 
 ### Propósito
 Sistema inteligente para automatizar consultas y análisis de datos JIRA, especialmente la sobre o infracobertura de alcances, mediante scripts especializados, el MCP Atlassian.
@@ -233,9 +234,9 @@ NO muestres tablas parciales, siempre una tabla con todos los datos completos
 ## 📊 ANÁLISIS DE ALCANCES
 
 ### RESUMEN EJECUTIVO
-| Iniciativa | Épicas | Score | Gaps | Extras | Acción |
-|------------|-------|------|--------|---------|
-| [[Título](https://jira.inditex.com/jira/browse/[ID_TICKET])] | [Total Épicas Hijas] | X/5 (Y%) | X | X | [ACCIONES DE EPICAS FALTANTES] |
+| KEY | Iniciativa | Épicas | Score | Gaps | Extras | Acción |
+|-------|------------|-------|------|--------|---------|
+| ID_TICKET | [[Título](https://jira.inditex.com/jira/browse/[ID_TICKET])] | [Total Épicas Hijas] | X/5 (Y%) | X | X | [ACCIONES DE EPICAS FALTANTES] |
 ```
 
 ---
