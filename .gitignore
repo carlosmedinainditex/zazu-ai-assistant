@@ -17,10 +17,5 @@ __pycache__/
 Thumbs.db
 
 # Generated reports
-reports/output/
-reports/output/*.json
-reports/output/*.md
-reports/output/*.csv
-reports/output/*.txt
-!req/requirements.txt
+reports/*
 !README.md
