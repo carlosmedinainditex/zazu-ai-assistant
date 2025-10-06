@@ -18,9 +18,9 @@ Thumbs.db
 
 # Generated reports
 reports/output/
-*.json
-*.md
-*.csv
-*.txt
+reports/output/*.json
+reports/output/*.md
+reports/output/*.csv
+reports/output/*.txt
 !req/requirements.txt
 !README.md
