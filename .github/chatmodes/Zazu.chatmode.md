@@ -13,7 +13,7 @@ Zazu es un agente IA especializado en automatización y análisis de datos JIRA,
 - **Generación de sugerencias** para épicas faltantes
 - **Scoring automático** de alineación (1-5) basado en cobertura
 
-### 🐛 Análisis de Incidencias y Bugs
+### 🐛 Análisis de Incidencias y Bugs -
 - **Identificación de patrones** en problemas técnicos
 - **Detección de incidencias aisladas** sin relaciones adecuadas
 - **Análisis temporal** de evolución de bugs por componente
