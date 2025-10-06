@@ -95,13 +95,13 @@ def main():
 logger = logging.getLogger("JqlQuery")
 
 def get_children_tickets(issue_key):
-    results = execute_jql(f'"Parent Link" = {issue_key}', max_results=100)
+    results = execute_jql(f'"Parent Link" = {issue_key}', max_results=200)
     formatted_results = []
     for issue in results:
         formatted_results.append(extract_required_fields(issue, is_initiative=False))
     return formatted_results
 
-def execute_jql(jql_query, max_results=50, fields=None):
+def execute_jql(jql_query, max_results=200, fields=None):
     try:
         # Get credentials
         jira_server = os.environ.get("JIRA_SERVER", "").strip()
