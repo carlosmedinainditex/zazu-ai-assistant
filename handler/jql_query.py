@@ -20,7 +20,7 @@ def build_parser():
     parser.add_argument("-m", action="store_true", help="Show menu mode")
     parser.add_argument("jql", nargs="?", help="JQL query to execute (if not provided, DEFAULT_JQL from .env will be used)")
     parser.add_argument("-e", "--env", help="Path to .env file with credentials")
-    parser.add_argument("--max-results", type=int, default=50, help="Maximum number of results to return (default: 50)")
+    parser.add_argument("--max-results", type=int, default=1000, help="Maximum number of results to return (default: 1000, use -1 for unlimited)")
     return parser
 
 def extract_required_fields(issue, is_initiative=True):
@@ -117,26 +117,49 @@ def execute_jql(jql_query, max_results=200, fields=None):
 
         if not fields:
             fields = ["summary", "status", "assignee", "reporter", "created", "duedate", "description", "project", "customfield_43462","customfield_43463"]
-        params = {
-            "jql": jql_query,
-            "maxResults": max_results,
-            "fields": ",".join(fields)
-        }
+        
+        # Implementar paginación para obtener TODOS los resultados
+        all_issues = []
+        start_at = 0
+        page_size = min(max_results, 100)  # JIRA API tiene un límite típico de 100 por página
+        
         headers = {
             "Accept": "application/json",
             "Authorization": f"Bearer {jira_token}"
         }
-        response = requests.get(api_url, params=params, headers=headers, timeout=30)
-        if response.status_code == 200:
+        
+        while True:
+            params = {
+                "jql": jql_query,
+                "startAt": start_at,
+                "maxResults": page_size,
+                "fields": ",".join(fields)
+            }
+            
+            response = requests.get(api_url, params=params, headers=headers, timeout=60)
+            
+            if response.status_code != 200:
+                logger.error(f"Error in query: {response.status_code}")
+                logger.error(f"Details: {response.text[:500]}")
+                return False
+            
             data = response.json()
             issues = data.get('issues', [])
             total = data.get('total', 0)
-            logger.info(f"Query successful! Found {len(issues)} issues (of {total} total).")
-            return issues
-        else:
-            logger.error(f"Error in query: {response.status_code}")
-            logger.error(f"Details: {response.text[:500]}")
-            return False
+            
+            all_issues.extend(issues)
+            
+            logger.info(f"Retrieved {len(all_issues)} of {total} total issues...")
+            
+            # Si ya tenemos todos los resultados o alcanzamos el límite, salir
+            if len(all_issues) >= total or len(issues) == 0:
+                break
+                
+            start_at += len(issues)
+        
+        logger.info(f"Query successful! Found {len(all_issues)} issues in total.")
+        return all_issues
+        
     except Exception as e:
         logger.error(f"Error executing JQL query: {str(e)}")
         return False
