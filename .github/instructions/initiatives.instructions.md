@@ -4,6 +4,7 @@ description: Instrucciones para el agente IA de Zazu (zazu-jira-api-connector), 
 author: Carlos Medina
 version: 4.0
 tags: ["zazu", "jira", "api", "automatizacion", "analisis", "atlassian", "mcp", "ai-agent"]
+tools: ["atlassian", "geppetto-api", "geppeto", "github"]
 globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ---
 

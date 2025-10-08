@@ -4,6 +4,7 @@ description: "Instrucciones para el análisis de incidencias con el agente IA de
 author: Carlos Medina
 version: 3.0
 tags: ["zazu", "jira", "api", "automatizacion", "analisis", "bugs", "incidencias", "atlassian", "mcp", "ai-agent", "iopprosu"]
+tools: ["atlassian", "geppetto-api", "geppeto", "github"]
 globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ---
 
