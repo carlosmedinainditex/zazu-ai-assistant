@@ -115,22 +115,21 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 
 ### Resumen Ejecutivo Conciso
 ```markdown
-## 📊 ANÁLISIS DE BUGS: [PRODUCTO]
-### ORIGEN: [TODOS/IOPPROSU/NO-IOPPROSU] | TOTAL: [N] ISSUES | [N] CLUSTERS IDENTIFICADOS
+## 📊 ANÁLISIS DE INCIDENCIAS: [PRODUCTO]
+### ORIGEN: [TODOS/IOPPROSU/NO-IOPPROSU] | TOTAL: [N] INCIDENCIAS | [N] GRUPOS IDENTIFICADOS
 
-### CLUSTERS CRÍTICOS
-| Cluster | #Bugs | Tipología | Componente | Acción Principal |
+### TIPOS DE INCIDENCIAS CRÍTICAS
+| GRUPO | #Bugs | Tipología | Componente | Acción Principal |
 |---------|-------|-----------|------------|------------------|
 | [Nombre] | [N] | [NullPointer/Timeout/etc] | [API/Frontend/etc] | [Acción concreta] |
 ```
 
-### Detalle por Cluster
+### Detalle por GRUPO
 ```markdown
-### ⚠️ CLUSTER: [NOMBRE] ([N] BUGS)
+### ⚠️ GRUPO: [NOMBRE] ([N] BUGS)
 **Tipología:** [Categoría técnica del error]
 **Componente:** [Componente o área afectada]
 **Patrón:** [Descripción concisa del patrón identificado, máx 2 líneas]
-
 **IDs afectados:** [ID-1], [ID-2], [ID-3]... [+N más]
 
 **Acción recomendada:**

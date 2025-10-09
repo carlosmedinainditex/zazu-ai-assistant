@@ -113,10 +113,7 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
    ```
    ✅ Contexto cargado: [X] elementos ([tipo])
    📊 Datos desde: [timestamp]
-   � Iniciando análisis automático...
    ```
-
-
 
 ---
 
@@ -176,13 +173,6 @@ NO muestres tablas parciales, siempre una tabla con todos los datos completos
 - **3/5**: Moderadamente alineado (50-70%)
 - **2/5**: Mal alineado (30-50%)
 - **1/5**: Desalineado (<30%)
-
-### Formato Obligatorio
-```markdown
-| KEY | Iniciativa | Épicas | Score | Gaps | Extras | Acción |
-|-----|------------|-------|------|--------|---------|--------|
-| ID  | [Título]  | Total | X/5  | X      | X       | [Sugerencias] |
-```
 
 ### Estructura JSON Iniciativa
 - **Campos críticos:** `id`, `summary`, `description`, `children`
