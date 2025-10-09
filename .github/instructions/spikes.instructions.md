@@ -2,7 +2,7 @@
 applyTo: "**"
 description: "Instrucciones clave para el análisis de Spikes con el agente IA de Zazu (zazu-jira-api-connector), herramienta especializada en la evaluación de investigaciones técnicas en JIRA con integración MCP Atlassian."
 author: Carlos Medina
-version: 1.0
+version: 2.0
 tags: ["zazu", "jira", "api", "automatizacion", "analisis", "spikes", "investigacion", "atlassian", "mcp", "ai-agent"]
 tools: ["atlassian", "geppetto-api", "geppeto", "github"]
 globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
@@ -20,43 +20,50 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 - "spikes pendientes de vinculación"
 - "spikes sin relación"
 - "spikes de [PRODUCTO] sin vincular"
+- "spikes de [PRODUCTO] en [PROYECTO] sin vincular"
 - "spikes desconectados"
 
 ---
 
 ## 🔍 FLUJO DE EJECUCIÓN OBLIGATORIO
 
-### 1. Validación de Producto (Opcional)
-- **Entrada:** Si se proporciona `[PRODUCTO]`, validar su existencia vía MCP.
-  - **Campos a verificar:** `"Products/Enablers - Affected"` (customfield_43463) y `"Product/Enabler - Principal"` (customfield_43462).
-  - **Comando:** ``"Product/Enabler - Principal"` = "[PRODUCTO]"`
-- **Resultado:**
-  - **✅ Éxito:** Si se encuentra el producto, continuar al siguiente paso.
-  - **❌ Fracaso:** Si no se encuentra, **detener ejecución** y notificar al usuario: `No se encontró el producto "[PRODUCTO]". Por favor, verifique el nombre o ID.`.
-- **Sin producto:** Si no se especifica un producto, realizar búsqueda general de spikes.
+### 1. Mapeo y Validación de Parámetros
+- **Mapeo de Producto:** 
+  - El parámetro `[PRODUCTO]` debe mapearse al campo Jira `"Products/Enablers - Affected"` (customfield_43463).
+  - También verificar contra `"Product/Enabler - Principal"` (customfield_43462).
+  - **Procedimiento MCP:** Ejecutar `mcp_atlassian_jira_search_fields keyword="[PRODUCTO]"` para confirmar existencia.
+
+- **Mapeo de Proyecto:** 
+  - El parámetro `[PROYECTO]` (ej: IOPPROSU) debe mapearse al campo Jira `project`.
+  - **Procedimiento MCP:** Verificar que el proyecto existe antes de incluirlo en la consulta.
+
+- **Resultado de validación:**
+  - **✅ Éxito:** Si se encuentran los parámetros, continuar.
+  - **❌ Fracaso:** Si no se encuentran, notificar: `No se encontró el [PRODUCTO/PROYECTO]. Por favor, verifique el nombre o ID.`.
 
 ### 2. Construcción JQL
 - **Lógica de Búsqueda:**
   - **Tipo de Incidencia:** `issuetype = Spike` (OBLIGATORIO)
   - **Filtro de Relaciones:** `AND linkedIssuesOf IS EMPTY` (OBLIGATORIO) 
   - **Estados a Excluir:** `AND status NOT IN (Discarded, Closed)` (OBLIGATORIO)
-  - **Filtrado por Producto (opcional):**
-    - Si se especifica producto: `AND ("Products/Enablers - Affected" = "[PRODUCTO]" OR "Product/Enabler - Principal" = "[PRODUCTO]")`
-  - **Periodo (opcional):** `AND created >= -180d` (modificable según necesidad)
+  - **Filtrados opcionales:**
+    - **Por Producto:** `AND ("Products/Enablers - Affected" = "[PRODUCTO]" OR "Product/Enabler - Principal" = "[PRODUCTO]")`
+    - **Por Proyecto:** `AND project = "[PROYECTO]"` 
+  - **Periodo:** `AND created >= -180d` (modificable según necesidad)
   
 - **JQL Base (General):**
   ```jql
   issuetype = Spike AND linkedIssuesOf IS EMPTY AND status NOT IN (Discarded, Closed) ORDER BY created DESC
   ```
   
-- **JQL Base (Con Producto):**
+- **JQL Base (Producto y Proyecto):**
   ```jql
-  issuetype = Spike AND linkedIssuesOf IS EMPTY AND status NOT IN (Discarded, Closed) AND ("Products/Enablers - Affected" = "[PRODUCTO]" OR "Product/Enabler - Principal" = "[PRODUCTO]") ORDER BY created DESC
+  issuetype = Spike AND linkedIssuesOf IS EMPTY AND status NOT IN (Discarded, Closed) AND ("Products/Enablers - Affected" = "[PRODUCTO]" OR "Product/Enabler - Principal" = "[PRODUCTO]") AND project = "[PROYECTO]" ORDER BY created DESC
   ```
 
 - **Búsqueda Adaptativa:**
   - Si la JQL inicial no devuelve resultados, **ampliar el periodo** (`-365d` o eliminar restricción temporal)
-  - Si aún no hay resultados, **verificar si existen spikes** para ese producto con otra JQL más genérica
+  - Si aún no hay resultados, **verificar si existen spikes** con una JQL más genérica
 
 ### 3. Ejecución JQL y Extracción de Datos 
 - **Comando:** Ejecutar la JQL construida utilizando el script principal con el modo de consulta directa:
@@ -81,94 +88,68 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ## 🧠 ANÁLISIS DE SPIKES: DE DATOS A RECOMENDACIONES
 
 ### Metodología de Evaluación
-1. **Análisis de Madurez:**
-   - **Tiempo Activo:** Calcular días transcurridos desde creación (`created`) hasta hoy.
-   - **Estado Actual:** Priorizar análisis por estado (`In Progress` > `Review` > `Done` > otros).
-   - **Actividad Reciente:** Evaluar comentarios o actualizaciones en últimos 30 días.
+1. **Análisis Simplificado:**
+   - **Antigüedad:** Categorizar por tiempo transcurrido desde creación: crítico (>90d), medio (30-90d), reciente (<30d)
+   - **Madurez Técnica:** Evaluar si el spike tiene conclusiones claras o hallazgos documentados
+   - **Impacto Potencial:** Determinar relevancia para el producto/proyecto según descripción y comentarios
 
-2. **Evaluación de Contenido:**
-   - **Descripción:** Analizar si contiene objetivos claros, preguntas a responder y criterios de éxito.
-   - **Comentarios:** Buscar evidencia de conclusiones, hallazgos o decisiones técnicas.
-   - **Anexos:** Verificar presencia de documentación técnica, POCs o diagramas.
-
-3. **Categorización por Impacto:**
-   - **Críticos:** Spikes activos por más de 30 días sin vinculación ni conclusiones documentadas.
-   - **Relevantes:** Spikes con hallazgos valiosos pero sin integrar a iniciativas/épicas.
-   - **Completos:** Spikes con conclusiones claras que deberían vincularse a tickets de implementación.
-   
-4. **Recomendación de Vinculación:**
-   - **Análisis de Resumen/Descripción:** Identificar palabras clave que indiquen área funcional/técnica.
-   - **Matching con Iniciativas Activas:** Sugerir posibles iniciativas/épicas relacionadas.
-   - **Acción Recomendada:** Proponer si debe vincularse, cerrarse o convertirse en una épica/historia.
+2. **Categorización Efectiva:**
+   - **Alta Prioridad:** Spikes antiguos (>60 días) con hallazgos técnicos valiosos sin integrar
+   - **Media Prioridad:** Spikes recientes con conclusiones claras pendientes de vincular
+   - **Seguimiento:** Spikes en proceso que necesitan monitorización pero no acción inmediata
 
 ---
 
-## 📊 FORMATO DE SALIDA OBLIGATORIO
+## 📊 FORMATO DE SALIDA SIMPLIFICADO
 
-### Resumen Ejecutivo Conciso
+### Resumen Ejecutivo Optimizado
 ```markdown
 ## 📊 ANÁLISIS DE SPIKES SIN VINCULAR
-### TOTAL: [N] SPIKES | CRÍTICOS: [N] | RELEVANTES: [N] | COMPLETOS: [N]
+### TOTAL: [N] SPIKES | ALTA PRIORIDAD: [N] | MEDIA PRIORIDAD: [N]
 
-### RESUMEN POR ANTIGÜEDAD
-| Periodo | Cantidad | % del Total |
-|---------|----------|------------|
-| > 90 días | [N] | [X]% |
-| 30-90 días | [N] | [X]% |
-| < 30 días | [N] | [X]% |
+| Periodo | Cantidad | Estado |
+|---------|----------|--------|
+| > 90d | [N] | 🚨 |
+| 30-90d | [N] | ⚠️ |
+| < 30d | [N] | ✅ |
 ```
 
-### Detalle por Categoría
+### Listado por Prioridad
 ```markdown
-### ⚠️ SPIKES CRÍTICOS ([N])
-| ID | Resumen | Días | Estado | Recomendación |
-|----|---------|------|--------|--------------|
-| [ID-1] | [Resumen] | [Días] | [Estado] | [Acción recomendada] |
+### 🚨 ALTA PRIORIDAD ([N])
+| ID | Resumen | Días | Estado | Acción |
+|----|---------|------|--------|--------|
+| [ID-1] | [Resumen max 60 chars] | [N] | [Estado] | [Acción corta] |
 
-### 🔍 SPIKES RELEVANTES ([N])
-| ID | Resumen | Días | Estado | Recomendación |
-|----|---------|------|--------|--------------|
-| [ID-1] | [Resumen] | [Días] | [Estado] | [Acción recomendada] |
-
-### ✅ SPIKES COMPLETOS ([N])
-| ID | Resumen | Días | Estado | Recomendación |
-|----|---------|------|--------|--------------|
-| [ID-1] | [Resumen] | [Días] | [Estado] | [Acción recomendada] |
+### ⚠️ MEDIA PRIORIDAD ([N])
+| ID | Resumen | Días | Estado | Acción |
+|----|---------|------|--------|--------|
+| [ID-1] | [Resumen max 60 chars] | [N] | [Estado] | [Acción corta] |
 ```
 
-### Análisis Detallado (Para Críticos)
+### Detalle Técnico (Solo para Alta Prioridad)
 ```markdown
-## 🔬 DETALLE DE SPIKE: [ID]
-**Resumen:** [Resumen del spike]
-**Creado:** [Fecha de creación] ([N] días)
-**Estado:** [Estado actual]
-**Última actividad:** [Fecha último comentario/cambio]
-
-**Hallazgos encontrados:**
-- [Hallazgo 1 identificado en descripción/comentarios]
-- [Hallazgo 2 identificado en descripción/comentarios]
-
-**Posibles vinculaciones:**
-- [Iniciativa/Épica relacionada 1]
-- [Iniciativa/Épica relacionada 2]
-
-**Recomendación:**
-[Acción recomendada con justificación específica]
+## 🔬 DETALLE: [ID]
+**Spike:** [Resumen] | **Creado hace:** [N] días | **Estado:** [Estado]
+**Hallazgos clave:** [1-2 conclusiones principales]
+**Acción recomendada:** [Acción concreta: vincular/cerrar/convertir]
 ```
 
 ---
 
 ## 🔄 CAPACIDADES ADICIONALES
 
-### Búsqueda por Equipos o Proyectos
-- Permitir filtrado adicional por equipo de desarrollo:
+### Filtrado por Proyecto
+- Permitir filtrado específico por proyecto usando la sintaxis:
   ```jql
-  ... AND "Team" = "[EQUIPO]"
+  ... AND project = "[PROYECTO]"
   ```
 
-### Análisis de Tendencias
-- Identificar equipos o áreas con mayor incidencia de spikes sin vincular
-- Calcular tiempo promedio de resolución y vinculación por equipo/área
+### Análisis Combinado
+- Permitir filtrado combinado de producto y proyecto:
+  ```jql
+  ... AND ("Products/Enablers - Affected" = "[PRODUCTO]") AND project = "[PROYECTO]"
+  ```
 
 ---
 
