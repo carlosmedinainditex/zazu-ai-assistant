@@ -1,6 +1,6 @@
 ---
 applyTo: "**"
-description: "Instrucciones clave para el análisis de Spikes con el agente IA de Zazu (zazu-jira-api-connclaeconnectrovector), herramienta especializada en la evaluación de investigaciones técnicas en JIRA con integración MCP Atlassian."
+description: "Instrucciones clave para el análisis de Spikes con el agente IA de Zazu (zazu-jira-api-connector), herramienta especializada en la evaluación de investigaciones técnicas en JIRA con integración MCP Atlassian."
 author: Carlos Medina
 version: 1.0
 tags: ["zazu", "jira", "api", "automatizacion", "analisis", "spikes", "investigacion", "atlassian", "mcp", "ai-agent"]
