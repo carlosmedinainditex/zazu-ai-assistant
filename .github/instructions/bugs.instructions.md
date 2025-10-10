@@ -128,13 +128,11 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ```markdown
 ### ⚠️ GRUPO: [NOMBRE] ([N] BUGS)
 **Tipología:** [Categoría técnica del error]
-**Componente:** [Componente o área afectada]
 **Patrón:** [Descripción concisa del patrón identificado, máx 2 líneas]
 **IDs afectados:** [ID-1], [ID-2], [ID-3]... [+N más]
 
-**Acción recomendada:**
-1. [Acción prioritaria y concreta]
-2. [Segunda acción si es necesaria]
+**Acción recomendada :**
+[Acciones recomendadas y concretas]
 ```
 
 ---
