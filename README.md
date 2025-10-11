@@ -10,7 +10,7 @@
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
-- [AI Agent Capabilities](#-ai-agent-capabilities)  
+- [Key Capabilities](#-key-capabilities)
 - [Quick Start](#-quick-start)
 - [Installation](#-installation)
 - [Configuration](#-configuration)
@@ -20,6 +20,8 @@
 - [Advanced Usage](#-advanced-usage)
 - [MCP Integration](#-mcp-integration)
 - [Troubleshooting](#-troubleshooting)
+- [Data Structure Reference](#-data-structure-reference)
+- [Best Practices](#-best-practices)
 
 ## 🎯 Overview
 
