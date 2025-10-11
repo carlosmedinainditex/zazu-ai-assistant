@@ -110,20 +110,7 @@ pip install -r req/requirements.txt
 chmod +x main.sh
 
 # 4. Verify installation
-python3 diagnosis/diagnostic.py --simple
-```
-
-### Method 2: Virtual Environment (Recommended)
-
-```bash
-# 1. Create virtual environment
-python3 -m venv zazu-env
-source zazu-env/bin/activate  # On Windows: zazu-env\Scripts\activate
-
-# 2. Clone and install
-git clone https://github.com/carlosmedinainditex/zazu-jira-api-connector.git
-cd zazu-jira-api-connector
-pip install -r req/requirements.txt
+python3 diagnosis/diagnostic.py --simple```
 
 # 3. Ready to use
 ./main.sh
@@ -149,16 +136,6 @@ Create a `.env` file in the project root directory:
 JIRA_SERVER=https://your-company.atlassian.net
 JIRA_USER=your.email@company.com
 JIRA_TOKEN=your_api_token_here
-
-# === OPTIONAL CONFIGURATION ===
-DEFAULT_JQL=project = MYPROJ AND issuetype = Initiative ORDER BY created DESC
-MAX_RESULTS=50
-
-# === PROXY CONFIGURATION (if needed) ===
-HTTP_PROXY=http://proxy.company.com:8080
-HTTPS_PROXY=https://proxy.company.com:8080
-NO_PROXY=localhost,127.0.0.1,.company.com
-```
 
 ### 🔐 Obtaining Jira API Token
 
@@ -313,24 +290,6 @@ Options:
 ### 3. 🎯 Natural Language Queries
 
 The AI agent automatically translates natural language to JQL:
-
-**Type Mapping:**
-- "initiatives" → `issuetype = initiative`
-- "epics" → `issuetype = Épica`
-- "stories" → `issuetype = Historia`
-- "bugs" → `issuetype = Bug`
-- "tasks" → `issuetype = Tarea`
-
-**Field Interpretation:**
-- **"in [value]"** → `"Vertical Owner" = "[value]"` (99% default)
-- **"project [name]"** → `project = "[name]"` (only when "project" explicitly mentioned)
-- **Products/Enablers** → `"Products/Enablers - Affected" = "[value]"`
-
-**State Mapping** (via MCP validation):
-- "discovery" → `status = 'Discovering'`
-- "in progress" → `status = 'In Progress'`
-- "done" → `status = 'Done'`
-
 **Examples:**
 ```
 "initiatives in Provider" 
@@ -559,30 +518,6 @@ description: "New analysis type rules"
 "Zazu, [trigger phrase for new analysis]"
 ```
 
-#### Custom Report Formats
-
-Create templates in `reports/` directory:
-
-```bash
-# Custom JSON processor
-mkdir -p reports/processors
-cat > reports/processors/custom_report.py << 'EOF'
-def generate_custom_report(data):
-    # Your custom logic
-    pass
-EOF
-```
-
-### 🔐 Security Best Practices
-
-```env
-# .env security checklist
-✅ Never commit .env to repository
-✅ Use Bearer tokens, not passwords
-✅ Rotate tokens every 90 days
-✅ Grant minimum required permissions
-✅ Use separate tokens for dev/prod
-```
 
 ```bash
 # Token permissions verification
@@ -592,44 +527,6 @@ python3 diagnosis/diagnostic.py --verbose
 ## � MCP Integration
 
 Zazu leverages **Model Context Protocol (MCP) Atlassian** for enhanced JIRA data access.
-
-### Available MCP Tools
-
-| Tool | Purpose | Usage |
-|------|---------|-------|
-| `mcp_atlassian_jira_search` | Execute JQL queries | Field validation, data enrichment |
-| `mcp_atlassian_jira_get_issue` | Retrieve issue details | Description fetching for scope analysis |
-| `mcp_atlassian_jira_search_fields` | Search field definitions | Status mapping, field validation |
-| `mcp_atlassian_jira_batch_get_changelogs` | Changelog history | Temporal analysis, trend detection |
-| `linkedIssues([ID])` | Issue relationships | Bug clustering, dependency mapping |
-
-### When MCP is Used
-
-**Automatic MCP Activation:**
-- ✅ **Field Validation**: Verifying custom field IDs and values
-- ✅ **Status Mapping**: Translating natural language states to JIRA statuses
-- ✅ **Description Enrichment**: Fetching full descriptions when not in JSON
-- ✅ **Product Validation**: Confirming product/enabler existence
-- ✅ **Relationship Analysis**: Exploring linked issues for clustering
-
-**Example MCP Flow:**
-```
-User: "Zazu, analyze bugs from Product Platform"
-  ↓
-AI: Validate "Product Platform" exists
-  → MCP: jira_search_fields keyword="Product Platform"
-  ↓
-AI: Build JQL with validated field
-  → JQL: "Products/Enablers - Affected" = "Product Platform" AND issuetype = Bug
-  ↓
-AI: Execute script
-  → ./main.sh -q "[JQL]"
-  ↓
-AI: Enrich with descriptions if needed
-  → MCP: jira_get_issue for each issue without description
-  ↓
-AI: Analyze and report
-```
 
 ### Configuration
 
@@ -905,134 +802,9 @@ Located in `reports/json/query_nested_[timestamp].json`:
 - Skip environment field for production bugs
 - Leave bugs without assignee indefinitely
 
-### For AI Agent Interaction
-
-✅ **DO:**
-- Use natural language: "Zazu, analyze initiatives in Provider"
-- Be specific about products/verticals
-- Request fresh data if analysis seems outdated
-- Review generated JQL for accuracy
-
-❌ **DON'T:**
-- Mix multiple analysis types in one request
-- Use stale data (>2 hours old)
-- Skip product validation step
-- Ignore 0/5 scores (indicates missing data)
-
-## 🚦 Health Indicators
-
-### Initiative Health Scoring
-
-| Score | Status | Meaning | Action Required |
-|-------|--------|---------|-----------------|
-| 5/5 | 🟢 Excellent | 90-100% coverage | Monitor only |
-| 4/5 | 🟢 Good | 70-90% coverage | Minor adjustments |
-| 3/5 | 🟡 Fair | 50-70% coverage | Review gaps |
-| 2/5 | 🟠 Poor | 30-50% coverage | Immediate attention |
-| 1/5 | 🔴 Critical | <30% coverage | Urgent action |
-| 0/5 | ⚫ Invalid | No epics/descriptions | Fix data quality |
-
-### Bug Cluster Health
-
-| Indicator | Healthy | Attention | Critical |
-|-----------|---------|-----------|----------|
-| **Isolated Bugs** | <10% | 10-25% | >25% |
-| **Cluster Size** | <3 bugs | 3-7 bugs | >7 bugs |
-| **Resolution Time** | <7 days | 7-30 days | >30 days |
-| **Priority** | Low-Medium | High | Highest |
-
-## 📚 Additional Resources
-
-### JIRA Query Language (JQL)
-
-- [Official JQL Documentation](https://support.atlassian.com/jira-software-cloud/docs/use-advanced-search-with-jira-query-language-jql/)
-- [JQL Functions Reference](https://support.atlassian.com/jira-software-cloud/docs/jql-functions/)
-- [JQL Keywords](https://support.atlassian.com/jira-software-cloud/docs/jql-keywords/)
-
-### Model Context Protocol
-
-- [MCP Documentation](https://modelcontextprotocol.io/)
-- [MCP Atlassian Server](https://github.com/modelcontextprotocol/servers)
-
-### Internal Documentation
-
-- `.github/instructions/bugs.instructions.md` - Bug analysis methodology
-- `.github/instructions/initiatives.instructions.md` - Scope analysis rules
-- `.github/chatmodes/Zazu.chatmode.md` - AI agent configuration
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-### Development Setup
-
-```bash
-# Fork and clone
-git clone https://github.com/your-username/zazu-jira-api-connector.git
-cd zazu-jira-api-connector
-
-# Create feature branch
-git checkout -b feature/your-feature-name
-
-# Install development dependencies
-pip install -r req/requirements.txt
-
-# Make changes and test
-python3 diagnosis/diagnostic.py --simple
-./main.sh -q "test-query"
-```
-
-### Contribution Areas
-
-| Area | Priority | Examples |
-|------|----------|----------|
-| 🧠 **AI Instructions** | High | New analysis types, improved patterns |
-| 📊 **Report Formats** | Medium | CSV export, HTML dashboards |
-| � **Script Optimization** | Medium | Faster pagination, caching |
-| 📚 **Documentation** | High | Use cases, tutorials, examples |
-| 🧪 **Testing** | High | Unit tests, integration tests |
-| 🎨 **UI/UX** | Low | Enhanced menu, color schemes |
-
-### Code Standards
-
-- **Python**: Follow PEP 8
-- **Documentation**: Add docstrings to functions
-- **Comments**: Explain complex logic
-- **Commit Messages**: Use conventional commits format
-
-```bash
-# Commit message format
-feat: add new bug clustering algorithm
-fix: correct pagination limit handling
-docs: update README with MCP examples
-refactor: simplify JQL query builder
-```
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-```
-Copyright (c) 2025 Zazu JIRA Analysis Agent
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-```
-
----
-
 <div align="center">
 
-**🤖 Built with AI for intelligent JIRA analysis**
-
-**Powered by MCP Atlassian Integration**
+**🤖 Built with Love By Carlos Medina**
 
 [⬆ Back to Top](#-zazu---ai-powered-jira-analysis-agent)
 
