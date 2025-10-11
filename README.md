@@ -10,7 +10,6 @@
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
-- [Key Capabilities](#-key-capabilities)
 - [Quick Start](#-quick-start)
 - [Installation](#-installation)
 - [Configuration](#-configuration)
@@ -21,33 +20,10 @@
 - [MCP Integration](#-mcp-integration)
 - [Troubleshooting](#-troubleshooting)
 - [Data Structure Reference](#-data-structure-reference)
-- [Best Practices](#-best-practices)
 
 ## 🎯 Overview
 
 **Zazu** is an AI-powered agent specialized in **automated JIRA analysis and project intelligence**. It combines advanced script automation with MCP Atlassian integration to provide deep insights into initiatives, epics, bugs, and project coverage.
-
-### 🤖 AI Agent Features
-
-- **🧠 Natural Language Processing**: Automatically translates user requests to JQL queries
-- **🔍 Intelligent Analysis**: Scope evaluation, bug clustering, and gap detection
-- **📊 Automated Reporting**: Executive summaries with actionable recommendations
-- **🎯 Context-Aware**: Understands product verticals, issue types, and JIRA structures
-- **⚡ Zero-Confirmation**: Acts directly without asking for permissions
-- **� MCP Atlassian Integration**: Enriched data access through Model Context Protocol
-
-## ✨ Key Capabilities
-
-| Capability | Description | AI-Powered |
-|------------|-------------|------------|
-| **Scope Analysis** | Evaluate initiative-epic coverage with automatic scoring (1-5) | ✅ |
-| **Bug Clustering** | Identify patterns and relationships in technical issues | ✅ |
-| **Gap Detection** | Discover missing epics and functional gaps | ✅ |
-| **Natural Language Queries** | "initiatives in Provider" → JQL generation | ✅ |
-| **Temporal Analysis** | Bug evolution and trend identification | ✅ |
-| **MCP Integration** | Real-time JIRA data enrichment | ✅ |
-| **Automatic Validation** | Product, field, and status verification | ✅ |
-| **Executive Reporting** | Actionable insights in table format | ✅ |
 
 ## 🚀 Quick Start
 
@@ -73,29 +49,6 @@ cp .env.example .env  # Edit with your Jira credentials
 # Run interactive menu
 ./main.sh
 ```
-
-### AI Agent Quick Examples
-
-```bash
-# 🧠 Natural Language Analysis (AI Agent Mode)
-# Just mention "Zazu" and describe what you want:
-
-# Initiative scope analysis
-"Zazu, analyze scopes of initiatives in Provider"
-
-# Bug analysis with clustering
-"Zazu, analyze bugs from Product Platform"
-
-# Gap detection
-"Zazu, what's missing in initiative AP-12345?"
-
-# 🔧 Direct JQL Execution (Script Mode)
-./main.sh -q "project = AP AND issuetype = Initiative"
-
-# 🩺 Connection test
-python3 diagnosis/diagnostic.py --simple
-```
-
 ## 🔧 Installation
 
 ### Method 1: Standard Installation
@@ -202,14 +155,6 @@ Launch the menu for guided navigation:
 ```bash
 ./main.sh
 ```
-
-Options:
-- Connection diagnostics
-- Initiative-Epic analysis
-- Custom JQL queries
-- Individual issue lookup
-- Export format selection
-
 ## 🔍 Analysis Types
 
 ### 1. 📊 Initiative Scope Analysis
@@ -326,7 +271,6 @@ zazu-jira-api-connector/
 │   └── menu.py                  # 🎯 Interactive menu system
 ├── 📁 reports/                  # Generated reports
 │   └── json/                    # 📊 Timestamped JSON outputs
-│       └── query_nested_YYYYMMDD_HHMMSS.json
 ├── 📁 req/                      # Dependencies
 │   └── requirements.txt         # Python packages
 ├── 📁 utils/                    # Utility modules
@@ -338,37 +282,6 @@ zazu-jira-api-connector/
 ├── .env.example                 # Environment template
 └── README.md                    # This documentation
 ```
-
-### 🎯 Module Responsibilities
-
-| Module | Purpose | AI Integration |
-|--------|---------|----------------|
-| `.github/instructions/bugs.instructions.md` | **Bug Analysis Rules** | Defines clustering logic, pattern detection, IOPPROSU handling |
-| `.github/instructions/initiatives.instructions.md` | **Scope Analysis Rules** | Scoring methodology, gap detection, field mappings |
-| `.github/chatmodes/Zazu.chatmode.md` | **AI Agent Behavior** | Natural language processing, auto-activation triggers |
-| `handler/jql_query.py` | **Data Extraction** | Pagination (up to 1000 results), parent-child nesting, JSON generation |
-| `diagnosis/diagnostic.py` | **Connectivity** | Bearer token validation, API endpoint testing |
-| `utils/printer.py` | **Output** | Formatted reports, executive tables |
-| `main.sh` | **Orchestration** | Direct query mode (`-q` flag) or menu navigation |
-
-### 📊 Data Flow
-
-```
-User Request → AI Agent (NLP) → JQL Translation → main.sh -q "[JQL]"
-                                                          ↓
-                                              handler/jql_query.py
-                                                          ↓
-                                          Pagination Loop (1000 results)
-                                                          ↓
-                                              Parent-Child Nesting
-                                                          ↓
-                                   reports/json/query_nested_[timestamp].json
-                                                          ↓
-                                              AI Agent Analysis
-                                                          ↓
-                                          Executive Report (Tables/Insights)
-```
-
 ## 🎯 Advanced Usage
 
 ### 🔄 Data Freshness Rules
@@ -526,7 +439,7 @@ description: "New analysis type rules"
 python3 diagnosis/diagnostic.py --verbose
 ```
 
-## � MCP Integration
+## MCP Integration
 
 Zazu leverages **Model Context Protocol (MCP) Atlassian** for enhanced JIRA data access.
 
@@ -549,16 +462,6 @@ MCP Atlassian should be configured in your AI assistant settings:
   }
 }
 ```
-
-### MCP vs Direct API
-
-| Aspect | MCP Tools | Direct API (Scripts) |
-|--------|-----------|---------------------|
-| **Speed** | Slower (real-time) | Faster (bulk extraction) |
-| **Use Case** | Validation, enrichment | Mass data extraction |
-| **Data Volume** | Small queries (<50 issues) | Large datasets (>1000 issues) |
-| **Zazu Strategy** | Validation first, then bulk script | ✅ Optimal approach |
-
 ## 🐛 Troubleshooting
 
 ### Common Issues and Solutions
@@ -582,117 +485,6 @@ pip install --upgrade requests certifi
 # Temporary workaround (not recommended for production)
 export PYTHONHTTPSVERIFY=0
 ```
-
-#### Query Problems
-
-**Issue**: `No Results Returned`
-```bash
-# Solution 1: Test JQL in Jira web interface first
-# Solution 2: Verify custom field IDs
-python3 -c "import os; from utils.env_loader import load_env_vars; load_env_vars(); print('Server:', os.environ.get('JIRA_SERVER'))"
-
-# Solution 3: Check permissions
-./main.sh -q "issuetype = Initiative" --max-results 5
-```
-
-**Issue**: `Field Not Found Error`
-- Custom fields vary between JIRA instances
-- Verify field IDs in your JIRA instance:
-  - Navigate to JIRA → Settings → Issues → Custom Fields
-  - Note the `customfield_XXXXX` IDs
-  - Update references in `handler/jql_query.py`
-
-#### AI Agent Issues
-
-**Issue**: AI agent not activating
-- ✅ Ensure you mention "Zazu" in your request
-- ✅ Use recognized trigger phrases: "analyze", "bugs from", "initiatives in"
-- ✅ Check `.github/chatmodes/Zazu.chatmode.md` is loaded
-
-**Issue**: Stale data being used
-```bash
-# Force fresh data generation
-rm reports/json/query_nested_*.json
-./main.sh -q "your-query"
-```
-
-**Issue**: Scope analysis returns 0/5 scores
-- ❌ **Cause**: Epics have no descriptions
-- ✅ **Solution**: Add descriptions to epics or use MCP to fetch them
-- ✅ **Verification**: Check `description` field in JSON output
-
-#### IOPPROSU-Specific Issues
-
-**Issue**: IOPPROSU bugs not found
-```bash
-# Correct JQL for IOPPROSU
-./main.sh -q "project = \"IOPPROSU\" AND (\"Products/Enablers - Affected\" = \"Your Product\")"
-
-# Note: Remove environment filters for IOPPROSU
-# ❌ WRONG: ... AND \"Entorno Incidencia\" = \"Produccion\"
-# ✅ RIGHT: ... (no environment filter)
-```
-
-### Debug Mode
-
-Enable detailed logging:
-
-```bash
-# Set debug environment
-export DEBUG=true
-
-# Run with verbose output
-python3 diagnosis/diagnostic.py --verbose
-
-# Check logs
-tail -f logs/zazu-jira-connector.log 2>/dev/null || echo "No log file yet"
-```
-
-### Performance Optimization
-
-#### Large Dataset Handling
-
-```bash
-# For datasets >1000 issues, use batching
-for offset in 0 500 1000 1500; do
-    ./main.sh -q "your-query AND created >= -90d" --max-results 500
-    sleep 2  # Rate limiting
-done
-```
-
-#### Network Issues
-
-```env
-# Add to .env for slow/unstable networks
-TIMEOUT=120
-RETRY_ATTEMPTS=5
-```
-
-### Known Limitations
-
-| Limitation | Workaround |
-|------------|------------|
-| Max 1000 results per query | Split queries by date ranges or projects |
-| Custom fields vary by instance | Update field IDs in `jql_query.py` |
-| MCP timeout on large issue descriptions | Use direct API for bulk extraction |
-| Pagination delay on >500 issues | Expected behavior, ~2s per 100 issues |
-
-### Getting Help
-
-1. **Check diagnostic output:**
-   ```bash
-   python3 diagnosis/diagnostic.py --verbose
-   ```
-
-2. **Verify JQL in JIRA UI** before using with Zazu
-
-3. **Review instruction files** in `.github/instructions/` for analysis rules
-
-4. **Check data freshness:**
-   ```bash
-   ls -lht reports/json/ | head -3
-   ```
-
 ## 📊 Data Structure Reference
 
 ### Initiative with Children (Parent Ticket)
@@ -733,77 +525,6 @@ RETRY_ATTEMPTS=5
   ]
 }
 ```
-
-### Bug/Issue (Standalone)
-
-```json
-{
-  "id": "IOPPROSU-9876",
-  "project": "IOPPROSU",
-  "summary": "NullPointerException in Payment Service",
-  "description": "Stack trace: java.lang.NullPointerException at PaymentController.process()...",
-  "status": "Open",
-  "assignee": "Ana Lopez",
-  "reporter": "System Monitor",
-  "created": "2025-10-01T14:22:00.000Z",
-  "duedate": null
-  // Note: Bugs don't have owner/affected/children unless they're special types
-}
-```
-
-### Generated Report JSON Structure
-
-Located in `reports/json/query_nested_[timestamp].json`:
-
-```json
-[
-  {
-    "id": "AP-100",
-    "project": "AP",
-    "summary": "Initiative Title",
-    "description": "Full description...",
-    "status": "In Progress",
-    "assignee": "Owner Name",
-    "reporter": "Reporter Name",
-    "created": "2025-01-01T00:00:00.000Z",
-    "duedate": "2025-12-31",
-    "owner": "Vertical Owner Value",
-    "affected": "Affected Product Value",
-    "children": [ /* array of child epics */ ]
-  }
-  // ... more initiatives
-]
-```
-
-## 🎓 Best Practices
-
-### For Initiative Analysis
-
-✅ **DO:**
-- Keep initiative descriptions detailed and structured
-- Add descriptions to ALL child epics (required for scoring)
-- Use consistent vertical owner values
-- Link epics properly with Parent Link field
-
-❌ **DON'T:**
-- Leave epic descriptions empty (results in 0/5 score)
-- Create initiatives without epics
-- Mix different products in same initiative without clear mapping
-
-### For Bug Analysis
-
-✅ **DO:**
-- Use consistent product/enabler values in custom fields
-- Add detailed descriptions with stack traces
-- Set environment correctly (Produccion/Preproduccion)
-- Link related bugs explicitly
-
-❌ **DON'T:**
-- Create isolated bugs without proper categorization
-- Omit component/module information
-- Skip environment field for production bugs
-- Leave bugs without assignee indefinitely
-
 <div align="center">
 
 **🤖 Built with Love By Carlos Medina**
