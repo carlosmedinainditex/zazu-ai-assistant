@@ -126,6 +126,7 @@ El agente se activa automáticamente cuando detecta la palabra **"Zazu"** en cua
 ```
 
 ## 🎯 Casos de Uso Principales
+Todo link a un ticket debe ser https://jira.inditex.com/jira/browse/[TICKET-ID]
 
 ### Gestión de Iniciativas
 - "Zazu, carga iniciativas en progreso de Proveedor"
@@ -154,7 +155,7 @@ zazu-jira-api-connector/
 ```
 
 ### Requisitos
-- Acceso a JIRA corporativo
+- Acceso a JIRA corporativo. 
 - Configuración MCP Atlassian
 - Permisos de ejecución en scripts
 - Python 3.x para diagnósticos
