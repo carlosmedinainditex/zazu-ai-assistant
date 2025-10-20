@@ -67,6 +67,13 @@ Create a `.env` file in the project root directory:
 JIRA_SERVER=https://your-company.atlassian.net
 JIRA_USER=your.email@company.com
 JIRA_TOKEN=your_api_token_here
+
+# Optional configuration
+MAX_RESULTS_PER_REQUEST=50
+
+# Default JQL query (initiatives)
+DEFAULT_JQL=project in (IOPCOMPRAS, IOPSOFT) AND issuetype = "Initiative" ORDER BY updated DESC
+
 ```
 
 ### 🔐 Obtaining Jira API Token
