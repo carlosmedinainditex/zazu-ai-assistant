@@ -374,7 +374,7 @@ MCP Atlassian should be configured in your AI assistant settings:
 ```
 <div align="center">
 
-**🤖 Built with Love By Carlos Medina and contributed by Javier Saiz and Javier Fradejas**
+**🤖 Built with Love by Carlos Medina and contributed by Javier Saiz and Javier Fradejas**
 
 [⬆ Back to Top](#-zazu---ai-powered-jira-analysis-agent)
 
