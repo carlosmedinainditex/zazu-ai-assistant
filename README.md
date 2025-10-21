@@ -11,14 +11,11 @@
 
 - [Overview](#-overview)
 - [Quick Start](#-quick-start)
-- [Installation](#-installation)
 - [Configuration](#-configuration)
 - [Usage Modes](#-usage-modes)
 - [Analysis Types](#-analysis-types)
 - [Project Structure](#-project-structure)
-- [Advanced Usage](#-advanced-usage)
 - [MCP Integration](#-mcp-integration)
-- [Troubleshooting](#-troubleshooting)
 - [Data Structure Reference](#-data-structure-reference)
 
 ## 🎯 Overview
@@ -49,27 +46,6 @@ cp .env.example .env  # Edit with your Jira credentials
 # Run interactive menu
 ./main.sh
 ```
-## 🔧 Installation
-
-### Method 1: Standard Installation
-
-```bash
-# 1. Clone repository
-git clone https://github.com/carlosmedinainditex/zazu-jira-api-connector.git
-cd zazu-jira-api-connector
-
-# 2. Install Python dependencies
-pip install -r req/requirements.txt
-
-# 3. Make executable
-chmod +x main.sh
-
-# 4. Verify installation
-python3 diagnosis/diagnostic.py --simple```
-
-# 3. Ready to use
-./main.sh
-```
 
 ### Dependencies
 
@@ -92,6 +68,14 @@ JIRA_SERVER=https://your-company.atlassian.net
 JIRA_USER=your.email@company.com
 JIRA_TOKEN=your_api_token_here
 
+# Optional configuration
+MAX_RESULTS_PER_REQUEST=50
+
+# Default JQL query (initiatives)
+DEFAULT_JQL=project in (IOPCOMPRAS, IOPSOFT) AND issuetype = "Initiative" ORDER BY updated DESC
+
+```
+
 ### 🔐 Obtaining Jira API Token
 
 1. **Navigate to Jira**: Go to your Jira profile → **Account Settings**
@@ -106,9 +90,6 @@ JIRA_TOKEN=your_api_token_here
 ```bash
 # Test your configuration
 python3 diagnosis/diagnostic.py
-
-# Simple connectivity test
-python3 diagnosis/diagnostic.py --simple
 ```
 
 ## 📖 Usage Modes
@@ -143,9 +124,6 @@ Execute JQL queries directly for raw data extraction:
 
 # Maximum results control
 ./main.sh -q "project = AP AND issuetype = Bug" --max-results 500
-
-# Analysis with specific fields
-python3 handler/jql_query.py "your-jql-query" --max-results 100
 ```
 
 ### 🎯 Interactive Menu Mode
@@ -252,130 +230,39 @@ The AI agent automatically translates natural language to JQL:
 ## 🏗️ Project Structure
 
 ```
-zazu-jira-api-connector/
+zazu-ai-assistant/
 ├── 📁 .github/                   # AI Agent Configuration
+│   ├── chatmodes/                # 🤖 AI agent behaviors
 │   ├── instructions/             # 🧠 Specialized analysis rules
 │   │   ├── bugs.instructions.md  # Bug analysis methodology
-│   │   └── initiatives.instructions.md  # Scope analysis rules
-│   └── chatmodes/                # 🤖 AI agent behaviors
-│       └── Zazu.chatmode.md      # Main agent configuration
+│   │   ├── initiatives.instructions.md  # Scope analysis rules
+│   │   └── spikes.instructions.md  # Spike analysis methodology
+│   └── prompts/                  # AI prompt configurations
 ├── 📁 config/                    # Configuration management
 │   ├── colors.py                 # Python color schemes
 │   └── colors.sh                 # Shell color schemes
 ├── 📁 diagnosis/                 # Connection diagnostics
 │   └── diagnostic.py             # 🔍 API connectivity testing
+├── 📁 env/                       # Environment configuration
+│   ├── .env                      # 🔐 Credentials (not in repo)
+│   └── .env.example              # Environment template
 ├── 📁 handler/                   # Core API handlers
-│   ├── jql_query.py             # ⭐ Main JQL processor with pagination
-│   └── issue_query.py           # Individual issue retrieval
-├── 📁 menu/                     # User interface
-│   └── menu.py                  # 🎯 Interactive menu system
-├── 📁 reports/                  # Generated reports
-│   └── json/                    # 📊 Timestamped JSON outputs
-├── 📁 req/                      # Dependencies
-│   └── requirements.txt         # Python packages
-├── 📁 utils/                    # Utility modules
-│   ├── env_loader.py           # Environment variable loader
-│   ├── printer.py              # Output formatting
-│   └── script_runner.py        # Script execution
-├── main.sh                      # 🚀 Main entry point
-├── .env                         # 🔐 Credentials (not in repo)
-├── .env.example                 # Environment template
-└── README.md                    # This documentation
-```
-## 🎯 Advanced Usage
-
-### 🔄 Data Freshness Rules
-
-**CRITICAL**: Zazu AI agent follows strict data freshness policies:
-
-- ✅ **Always use most recent JSON** by timestamp from `/reports/json/`
-- ❌ **Never use files older than 2 hours**
-- ✅ **Auto-regenerate** if data is stale
-- ✅ **One source of truth** per analysis session
-
-```bash
-# Check latest generated data
-ls -lt reports/json/ | head -5
-
-# Manually regenerate if needed
-./main.sh -q "your-jql-query"
-```
-
-### 🎨 Custom JQL Patterns
-
-#### Initiative Analysis Patterns
-
-```bash
-# All initiatives in specific vertical
-./main.sh -q "\"Vertical Owner\" = \"Provider\" AND issuetype = initiative"
-
-# Initiatives with affected products
-./main.sh -q "\"Products/Enablers - Affected\" = \"Product Platform\" AND issuetype = initiative"
-
-# Time-filtered initiatives
-./main.sh -q "issuetype = initiative AND created >= -90d"
-
-# Status-specific initiatives
-./main.sh -q "issuetype = initiative AND status IN ('In Progress', 'Discovering')"
-```
-
-#### Bug Analysis Patterns
-
-```bash
-# Production bugs for specific product
-./main.sh -q "\"Products/Enablers - Affected\" = \"Product Platform\" AND issuetype = Bug AND \"Entorno Incidencia\" = \"Produccion\""
-
-# IOPPROSU bugs (all environments)
-./main.sh -q "project = \"IOPPROSU\" AND (\"Products/Enablers - Affected\" = \"Your Product\" OR \"Product/Enabler - Principal\" = \"Your Product\")"
-
-# Critical bugs from last 30 days
-./main.sh -q "issuetype = Bug AND priority = Highest AND created >= -30d"
-```
-
-#### Cross-Vertical Queries
-
-```bash
-# Multi-vertical initiatives
-./main.sh -q "\"Vertical Owner\" IN (\"Provider\", \"Finished Product\", \"Engineering\") AND issuetype = initiative"
-
-# Parent-child relationships
-./main.sh -q "\"Parent Link\" = AP-12345"
-```
-
-### 🧪 Advanced Analysis Scenarios
-
-#### Scenario 1: Complete Initiative Health Check
-
-```bash
-# Step 1: Extract all initiatives
-./main.sh -q "\"Vertical Owner\" = \"Provider\" AND issuetype = initiative"
-
-# Step 2: Use AI agent for scope analysis
-"Zazu, analyze scopes and detect gaps in Provider initiatives"
-
-# Step 3: Review executive report with scoring
-```
-
-#### Scenario 2: Bug Pattern Investigation
-
-```bash
-# Step 1: Extract recent bugs
-./main.sh -q "\"Products/Enablers - Affected\" = \"Product Platform\" AND issuetype = Bug AND created >= -90d"
-
-# Step 2: Request clustering analysis
-"Zazu, analyze bugs from Product Platform and identify clusters"
-
-# Step 3: Review critical clusters and isolated issues
-```
-
-#### Scenario 3: Multi-Product Analysis
-
-```bash
-# Extract data for multiple products
-./main.sh -q "\"Products/Enablers - Affected\" IN (\"Product A\", \"Product B\", \"Product C\") AND issuetype = Bug"
-
-# AI-powered comparative analysis
-"Zazu, compare bug patterns across Product A, B, and C"
+│   ├── issue_query.py            # Individual issue retrieval
+│   └── jql_query.py              # ⭐ Main JQL processor with pagination
+├── 📁 menu/                      # User interface
+│   └── menu.py                   # 🎯 Interactive menu system
+├── 📁 reports/                   # Generated reports
+│   ├── json/                     # 📊 Timestamped JSON outputs
+│   └── md/                       # 📄 Markdown executive reports
+├── 📁 req/                       # Dependencies
+│   └── requirements.txt          # Python packages
+├── 📁 scripts/                   # Additional scripts (empty)
+├── 📁 utils/                     # Utility modules
+│   ├── env_loader.py             # Environment variable loader
+│   ├── printer.py                # Output formatting
+│   └── script_runner.py          # Script execution
+├── main.sh                       # 🚀 Main entry point
+└── README.md                     # This documentation
 ```
 
 ### 📊 Custom Field Reference
@@ -389,23 +276,6 @@ Zazu uses specific custom fields for Inditex JIRA instance:
 | Product/Enabler - Principal | `customfield_43462` | Primary product (alternatives) |
 | Entorno Incidencia | `customfield_10824` | Bug environment (Produccion/Preproduccion) |
 | Parent Link | Built-in field | Epic-Initiative relationship |
-
-### 🔧 Pagination & Performance
-
-The `jql_query.py` handler implements automatic pagination:
-
-```python
-# Configuration in jql_query.py
---max-results 1000  # Default: retrieves up to 1000 issues
---max-results -1    # Unlimited (use with caution)
---max-results 100   # Conservative limit for testing
-```
-
-**Performance Tips:**
-- Use specific filters to reduce result sets
-- JIRA API limits: 100 results per page (automatically handled)
-- Large datasets (>500 issues): Expect 30-60 seconds processing
-- Parent-child nesting adds ~2s per 100 initiatives
 
 ### 🛠️ Extending Zazu
 
@@ -462,29 +332,6 @@ MCP Atlassian should be configured in your AI assistant settings:
   }
 }
 ```
-## 🐛 Troubleshooting
-
-### Common Issues and Solutions
-
-#### Connection Problems
-
-**Issue**: `Connection Error` or `Authentication Failed`
-```bash
-# Solution: Verify configuration
-python3 diagnosis/diagnostic.py
-
-# Check environment variables
-cat .env | grep -E "JIRA_(SERVER|USER|TOKEN)"
-```
-
-**Issue**: `SSL Certificate Verification Failed`
-```bash
-# Solution: Update requests library
-pip install --upgrade requests certifi
-
-# Temporary workaround (not recommended for production)
-export PYTHONHTTPSVERIFY=0
-```
 ## 📊 Data Structure Reference
 
 ### Initiative with Children (Parent Ticket)
@@ -527,7 +374,7 @@ export PYTHONHTTPSVERIFY=0
 ```
 <div align="center">
 
-**🤖 Built with Love By Carlos Medina**
+**🤖 Built with Love by Carlos Medina and contributed by Javier Saiz and Javier Fradejas**
 
 [⬆ Back to Top](#-zazu---ai-powered-jira-analysis-agent)
 
