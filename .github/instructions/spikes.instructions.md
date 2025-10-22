@@ -98,10 +98,11 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
   **🪟 IMPORTANTE PARA WINDOWS:**
   - **Escapar comillas dobles:** En Windows usar `\"` para comillas dentro de la JQL
   - **Comando Windows:** `./main.sh -q "issuetype = \"Spike\" AND \"Products/Enablers - Affected\" = \"PRODUCTO\""`
-  - **Comando Unix/Linux:** `./main.sh -q "issuetype = \"Spike\" AND \"Products/Enablers - Affected\" = \"PRODUCTO\""`
+  - **Comando Unix/Linux (bash):** `./main.sh -q "issuetype = \"Spike\" AND \"Products/Enablers - Affected\" = \"PRODUCTO\""`
+  - **Comando Unix/Linux (recomendado, usando comillas simples para evitar escapes):** `./main.sh -q 'issuetype = "Spike" AND "Products/Enablers - Affected" = "PRODUCTO"'`
+  - **Nota:** En Unix/Linux, si usas comillas simples exteriores, no necesitas escapar las comillas dobles internas. Si usas bash, el ejemplo con `\"` también funciona, pero en otros shells puede variar.
   - **Problema común:** Las comillas dentro del JQL deben ser escapadas correctamente para evitar errores de parsing
   - **Alternativa Windows:** Usar comillas simples en JQL cuando sea posible: `./main.sh -q "issuetype = 'Spike' AND 'Products/Enablers - Affected' = 'PRODUCTO'"`
-  
 - **Proceso de Datos:** 
   - El script generará automáticamente un archivo JSON en `/reports/json/` con timestamp
   - **🚨 CRÍTICO:** Este archivo será la fuente de datos ÚNICA y AUTORITATIVA para el análisis
