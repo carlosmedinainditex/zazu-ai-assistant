@@ -160,7 +160,7 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 **CRÍTICO - Manejo de Caracteres Especiales en Windows:**
 - **Regla fundamental:** En Windows, SIEMPRE escapar comillas dobles dentro de JQL usando `\"`
 - **Sintaxis correcta Windows:** `./main.sh -q "\"field\" = \"value\" AND \"field2\" = \"value2\""`
-- **Sintaxis correcta Unix/Linux:** `./main.sh -q "\"field\" = \"value\" AND \"field2\" = \"value2\""`
+- **Sintaxis correcta Unix/Linux:** `./main.sh -q 'field = \"value\" AND field2 = \"value2\"'`
 - **Alternativa universal:** Usar comillas simples cuando sea posible: `./main.sh -q "'field' = 'value'"`
 - **Error común:** `./main.sh -q ""field" = "value""` → **INCORRECTO** - causará fallos de parsing
 - **Verificación:** Si el comando falla, revisar primero el escape de comillas antes que la sintaxis JQL
