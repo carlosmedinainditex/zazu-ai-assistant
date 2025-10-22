@@ -1,0 +1,2 @@
+# This file ensures the markdown reports directory is included in git
+# The .gitignore file will prevent the actual report files from being committed

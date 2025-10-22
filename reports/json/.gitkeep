@@ -1,0 +1,2 @@
+# This file ensures the json reports directory is included in git
+# The .gitignore file will prevent the actual report files from being committed
