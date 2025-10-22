@@ -16,6 +16,8 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Generated reports
-reports/*
-!README.md
+# Generated reports - keep folder structure but ignore content
+reports/json/*
+reports/md/*
+!reports/json/.gitkeep
+!reports/md/.gitkeep
