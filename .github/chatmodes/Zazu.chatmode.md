@@ -102,6 +102,12 @@ El agente se activa automáticamente cuando detecta la palabra **"Zazu"** en cua
 - **`./main.sh -q "[JQL]"`**: Generación de datos masivos
 - **`./diagnosis/diagnostic.py`**: Diagnóstico de errores
 
+**🪟 IMPORTANTE PARA WINDOWS:**
+- **Escapar comillas dobles:** Usar `\"` para comillas dentro de la JQL
+- **Ejemplo correcto:** `./main.sh -q "\"Vertical Owner\" = \"Proveedor\""`
+- **Alternativa:** Usar comillas simples cuando sea posible: `./main.sh -q "'Vertical Owner' = 'Proveedor'"`
+- **Problema común:** Las comillas mal escapadas causan errores de parsing en bash
+
 ### MCP Atlassian
 - **Validación**: `mcp_atlassian_jira_search_fields`
 - **Búsquedas**: `mcp_atlassian_jira_search`

@@ -65,6 +65,14 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
   ```bash
   ./main.sh -q "JQL_CONSTRUIDA_ANTERIORMENTE"
   ```
+  
+  **🪟 IMPORTANTE PARA WINDOWS:**
+  - **Escapar comillas dobles:** En Windows usar `\"` para comillas dentro de la JQL
+  - **Comando Windows:** `./main.sh -q "campo = \"valor\" AND otro_campo = \"otro_valor\""`
+  - **Comando Unix/Linux:** `./main.sh -q "campo = \"valor\" AND otro_campo = \"otro_valor\""`
+  - **Problema común:** Las comillas dentro del JQL deben ser escapadas correctamente para evitar errores de parsing
+  - **Alternativa Windows:** Usar comillas simples en JQL cuando sea posible: `./main.sh -q "campo = 'valor' AND otro_campo = 'valor'"`
+
 - **Proceso de Datos:** 
   - El script generará automáticamente un archivo JSON en `/reports/json/` con timestamp
   - **🚨 CRÍTICO:** Este archivo será la fuente de datos ÚNICA y AUTORITATIVA para el análisis
@@ -146,6 +154,15 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ---
 
 ## 🎯 REGLAS DE ORO Y BUENAS PRÁCTICAS
+
+### 🪟 Compatibilidad Multiplataforma
+**CRÍTICO - Manejo de Caracteres Especiales en Windows:**
+- **Regla fundamental:** En Windows, SIEMPRE escapar comillas dobles dentro de JQL usando `\"`
+- **Sintaxis correcta Windows:** `./main.sh -q "\"field\" = \"value\" AND \"field2\" = \"value2\""`
+- **Sintaxis correcta Unix/Linux:** `./main.sh -q "\"field\" = \"value\" AND \"field2\" = \"value2\""`
+- **Alternativa universal:** Usar comillas simples cuando sea posible: `./main.sh -q "'field' = 'value'"`
+- **Error común:** `./main.sh -q ""field" = "value""` → **INCORRECTO** - causará fallos de parsing
+- **Verificación:** Si el comando falla, revisar primero el escape de comillas antes que la sintaxis JQL
 
 ### Reglas Prioritarias
 - 🚨 **Exactitud Proyecto:** O no se pone proyecto o se usa IOPPROSU como nombre del proyecto, porque se ha especificado.
