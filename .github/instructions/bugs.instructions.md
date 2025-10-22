@@ -69,8 +69,9 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
   **🪟 IMPORTANTE PARA WINDOWS:**
   - **Escapar comillas dobles:** En Windows usar `\"` para comillas dentro de la JQL
   - **Comando Windows:** `./main.sh -q "campo = \"valor\" AND otro_campo = \"otro_valor\""`
-  - **Comando Unix/Linux:** `./main.sh -q "campo = \"valor\" AND otro_campo = \"otro_valor\""`
+  - **Comando Unix/Linux:** `./main.sh -q 'campo = "valor" AND otro_campo = "otro_valor"'`
   - **Problema común:** Las comillas dentro del JQL deben ser escapadas correctamente para evitar errores de parsing
+  - **Nota:** En Unix/Linux (bash), es preferible usar comillas simples para envolver el argumento si contiene comillas dobles. En Windows, se deben escapar las comillas dobles con `\"`.
   - **Alternativa Windows:** Usar comillas simples en JQL cuando sea posible: `./main.sh -q "campo = 'valor' AND otro_campo = 'valor'"`
 
 - **Proceso de Datos:** 
