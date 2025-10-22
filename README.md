@@ -92,6 +92,41 @@ DEFAULT_JQL=project in (IOPCOMPRAS, IOPSOFT) AND issuetype = "Initiative" ORDER 
 python3 diagnosis/diagnostic.py
 ```
 
+### 🪟 Windows Compatibility
+
+**Important for Windows users - Command escaping:**
+
+When using `main.sh` on Windows, proper quote escaping is critical:
+
+```bash
+# ✅ CORRECT - Escape quotes inside JQL
+./main.sh -q "\"Vertical Owner\" = \"Provider\" AND status = \"In Progress\""
+
+# ❌ INCORRECT - Will cause parsing errors
+./main.sh -q ""Vertical Owner" = "Provider""
+
+# 🔄 ALTERNATIVE - Use single quotes when possible
+./main.sh -q "'Vertical Owner' = 'Provider' AND status = 'In Progress'"
+```
+
+**Common Windows issues:**
+- **Double quotes inside JQL must be escaped** with `\"`
+- **PowerShell may require additional escaping** - use Command Prompt when possible  
+- **Git Bash recommended** for better bash compatibility
+
+**If commands fail on Windows:**
+1. First check quote escaping
+2. Try using single quotes instead of double quotes in JQL
+3. Ensure you're using Command Prompt or Git Bash (not PowerShell)
+
+### 📁 Repository Structure Note
+
+**Reports Directory:**
+- The `/reports` folder structure is **tracked in git** but content is **ignored**
+- `.gitkeep` files ensure the directories exist after cloning
+- All generated reports (JSON/MD) are automatically ignored to keep repo clean
+- This ensures consistent directory structure across different environments
+
 ## 📖 Usage Modes
 
 Zazu operates in **two complementary modes**:
@@ -251,9 +286,12 @@ zazu-ai-assistant/
 │   └── jql_query.py              # ⭐ Main JQL processor with pagination
 ├── 📁 menu/                      # User interface
 │   └── menu.py                   # 🎯 Interactive menu system
-├── 📁 reports/                   # Generated reports
-│   ├── json/                     # 📊 Timestamped JSON outputs
-│   └── md/                       # 📄 Markdown executive reports
+├── 📁 reports/                   # Generated reports (folder tracked, content ignored)
+│   ├── json/                     # 📊 Timestamped JSON outputs (.gitkeep maintained)
+│   │   └── .gitkeep             # Ensures directory exists in git
+│   ├── md/                       # 📄 Markdown executive reports (.gitkeep maintained)  
+│   │   └── .gitkeep             # Ensures directory exists in git
+│   └── [report files ignored]   # Actual reports ignored by .gitignore
 ├── 📁 req/                       # Dependencies
 │   └── requirements.txt          # Python packages
 ├── 📁 scripts/                   # Additional scripts (empty)
