@@ -105,6 +105,13 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ./main.sh -q "consulta_JQL_generada"
 ```
 
+**🪟 IMPORTANTE PARA WINDOWS:**
+- **Escapar comillas dobles:** En Windows usar `\"` para comillas dentro de la JQL
+- **Comando Windows:** `./main.sh -q "\"Vertical Owner\" = \"Proveedor\" AND status = \"In Progress\""`
+- **Comando Unix/Linux:** `./main.sh -q '"Vertical Owner" = "Proveedor" AND status = "In Progress"'`
+- **Problema común:** Las comillas dentro del JQL deben ser escapadas correctamente para evitar errores de parsing
+- **Alternativa Windows:** Usar comillas simples en JQL cuando sea posible: `./main.sh -q "'Vertical Owner' = 'Proveedor' AND status = 'In Progress'"`
+
 ### 4. Procesamiento Automático
 1. **Leer JSON más reciente** por timestamp
 2. **Cargar en contexto** todos los datos
@@ -179,6 +186,15 @@ NO muestres tablas parciales, siempre una tabla con todos los datos completos
 - **Épicas hijas:** Array en campo `children` con `summary` y `description`
 
 ## 🎯 REGLAS ESPECÍFICAS PARA ALCANCES
+
+### 🪟 Compatibilidad Multiplataforma
+**CRÍTICO - Manejo de Caracteres Especiales en Windows:**
+- **Regla fundamental:** En Windows, SIEMPRE escapar comillas dobles dentro de JQL usando `\"`
+- **Sintaxis correcta Windows:** `./main.sh -q "\"Vertical Owner\" = \"Proveedor\" AND status = \"In Progress\""`
+- **Sintaxis correcta Unix/Linux:** `./main.sh -q "\"Vertical Owner\" = \"Proveedor\" AND status = \"In Progress\""`
+- **Alternativa universal:** Usar comillas simples cuando sea posible: `./main.sh -q "'Vertical Owner' = 'Proveedor'"`
+- **Error común:** `./main.sh -q ""Vertical Owner" = "Proveedor""` → **INCORRECTO** - causará fallos de parsing
+- **Verificación:** Si el comando falla, revisar primero el escape de comillas antes que la sintaxis JQL
 
 ### Obligatorio en Análisis de Alcances
 - ✅ **Consultar descripciones vía MCP** si no están en JSON
