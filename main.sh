@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 # Script to test Jira API connection and queries
 
 # Get script directory
