@@ -3,7 +3,7 @@ applyTo: "**"
 description: "Instrucciones clave para el análisis de Spikes con el agente IA de Zazu (zazu-jira-api-connector), herramienta especializada en la evaluación de investigaciones técnicas en JIRA con integración MCP Jira."
 author: Carlos Medina
 version: 2.0
-tools: ["jira", "geppetto-api", "geppeto", "github"]
+tools: ["jira", "geppetto-api", "geppetto", "github"]
 tags: ["zazu", "jira", "api", "automatizacion", "analisis", "spikes", "investigacion", "mcp", "ai-agent"]
 globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ---

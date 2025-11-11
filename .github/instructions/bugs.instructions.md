@@ -3,7 +3,7 @@ applyTo: "**"
 description: "Instrucciones para el análisis de incidencias con el agente IA de Zazu (zazu-jira-api-connector), herramienta especializada en análisis de bugs y problemas en JIRA con integración MCP Jira."
 author: Carlos Medina
 version: 3.0
-tools: ["jira", "geppetto-api", "geppeto", "github"]
+tools: ["jira", "geppetto-api", "geppetto", "github"]
 tags: ["zazu", "jira", "api", "automatizacion", "analisis", "bugs", "incidencias", "mcp", "ai-agent", "iopprosu"]
 globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ---
