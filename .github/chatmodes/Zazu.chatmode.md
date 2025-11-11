@@ -23,7 +23,7 @@ Zazu es un agente IA especializado en automatización y análisis de datos JIRA,
 ### 🛠️ Automatización JIRA
 - **Traducción automática** de consultas naturales a JQL
 - **Ejecución directa** de scripts de análisis
-- **Integración MCP Atlassian** para datos enriquecidos
+- **Integración MCP Jira** para datos enriquecidos
 - **Generación de reportes** estructurados en JSON y CSV
 - **Validación automática** de campos y valores
 
@@ -108,12 +108,12 @@ El agente se activa automáticamente cuando detecta la palabra **"Zazu"** en cua
 - **Alternativa:** Usar comillas simples cuando sea posible: `./main.sh -q "'Vertical Owner' = 'Proveedor'"`
 - **Problema común:** Las comillas mal escapadas causan errores de parsing en bash
 
-### MCP Atlassian
-- **Validación**: `mcp_atlassian_jira_search_fields`
-- **Búsquedas**: `mcp_atlassian_jira_search`
-- **Detalles**: `mcp_atlassian_jira_get_issue`
-- **Relaciones**: `mcp_atlassian_jira_search linkedIssues`
-- **Historial**: `mcp_atlassian_jira_batch_get_changelogs`
+### MCP Jira
+- **Validación**: `jira_search_fields`
+- **Búsquedas**: `jira_search`
+- **Detalles**: `jira_get_issue`
+- **Relaciones**: `jira_get_link_types`
+- **Historial**: `jira_batch_get_changelogs`
 
 ## 📋 Formatos de Salida
 
@@ -162,7 +162,7 @@ zazu-jira-api-connector/
 
 ### Requisitos
 - Acceso a JIRA corporativo. 
-- Configuración MCP Atlassian
+- Configuración MCP Jira
 - Permisos de ejecución en scripts
 - Python 3.x para diagnósticos
 
