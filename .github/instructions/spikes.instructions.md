@@ -1,10 +1,10 @@
 ---
 applyTo: "**"
-description: "Instrucciones clave para el análisis de Spikes con el agente IA de Zazu (zazu-jira-api-connector), herramienta especializada en la evaluación de investigaciones técnicas en JIRA con integración MCP Atlassian."
+description: "Instrucciones clave para el análisis de Spikes con el agente IA de Zazu (zazu-jira-api-connector), herramienta especializada en la evaluación de investigaciones técnicas en JIRA con integración MCP Jira."
 author: Carlos Medina
 version: 2.0
-tags: ["zazu", "jira", "api", "automatizacion", "analisis", "spikes", "investigacion", "atlassian", "mcp", "ai-agent"]
-tools: ["atlassian", "geppetto-api", "geppeto", "github"]
+tools: ["jira", "geppetto-api", "geppeto", "github"]
+tags: ["zazu", "jira", "api", "automatizacion", "analisis", "spikes", "investigacion", "mcp", "ai-agent"]
 globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ---
 
@@ -41,7 +41,7 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 - **Mapeo de Producto:** 
   - El parámetro `[PRODUCTO]` debe mapearse al campo Jira `"Products/Enablers - Affected"` (customfield_43463).
   - También verificar contra `"Product/Enabler - Principal"` (customfield_43462).
-  - **Procedimiento MCP:** Ejecutar `mcp_atlassian_jira_search_fields keyword="[PRODUCTO]"` para confirmar existencia.
+  - **Procedimiento MCP:** Ejecutar `jira_search_fields keyword="[PRODUCTO]"` para confirmar existencia.
 
 - **Mapeo de Proyecto:** 
   - El parámetro `[PROYECTO]` (ej: IOPPROSU) debe mapearse al campo Jira `project`.

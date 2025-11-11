@@ -1,10 +1,10 @@
 ---
 applyTo: "**"
-description: Instrucciones para el agente IA de Zazu (zazu-jira-api-connector), herramienta de automatización y análisis de JIRA con integración MCP Atlassian.
+description: Instrucciones para el agente IA de Zazu (zazu-jira-api-connector), herramienta de automatización y análisis de JIRA con integración MCP Jira.
 author: Carlos Medina
 version: 4.0
-tags: ["zazu", "jira", "api", "automatizacion", "analisis", "atlassian", "mcp", "ai-agent"]
-tools: ["atlassian", "geppetto-api", "geppeto", "github"]
+tools: ["jira", "geppetto-api", "geppeto", "github"]
+tags: ["zazu", "jira", "api", "automatizacion", "analisis", "mcp", "ai-agent"]
 globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ---
 
@@ -138,7 +138,7 @@ globs: ["**/zazu-jira-api-connector/**/*", "**/*zazu*", "**/reports/**/*"]
 ### Flujo de Análisis Detallado
 
 #### 1. Recopilación de Datos
-**🚨 OBLIGATORIO - Consultar Descripciones MCP Atlassian si no están en JSON:**
+**🚨 OBLIGATORIO - Consultar Descripciones MCP Jira si no están en JSON:**
 
 **Para cada iniciativa:**
 3. **Procesar descripciones para identificar:**
